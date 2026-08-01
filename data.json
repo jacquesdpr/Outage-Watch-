@@ -1,0 +1,90 @@
+{
+  "areas": [
+    {
+      "id": "burgundy-estate",
+      "name": "Burgundy Estate",
+      "checked": "17:15",
+      "elec": {
+        "status": "clear",
+        "statusText": "No outage reported by City",
+        "note": "1 resident flagged power off in the last 2 hrs — unconfirmed by the City yet, worth a follow-up check if it's you.",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No active disruption",
+        "note": "Last burst (Cinnebar Street) was restored yesterday.",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate"
+      }
+    },
+    {
+      "id": "durbanville",
+      "name": "Durbanville",
+      "checked": "10:45",
+      "elec": {
+        "status": "clear",
+        "statusText": "No outage reported by City",
+        "note": "Substation maintenance on Queen St / New St was restored yesterday.",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No active disruption",
+        "note": "Durbanville averages ~1 burst main a week — check live if pressure drops.",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville"
+      }
+    },
+    {
+      "id": "brackenfell",
+      "name": "Brackenfell",
+      "checked": "08:45",
+      "elec": {
+        "status": "planned",
+        "statusText": "Planned outage tonight — Brackenfell Industria",
+        "note": "Substation maintenance, Brackengate: London Circle, Rome, Hamman &amp; Paris St. Sat 22:00 → Sun 14:00. Residential Brackenfell itself is unaffected.",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No active disruption",
+        "note": "",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell"
+      }
+    },
+    {
+      "id": "goodwood",
+      "name": "Goodwood",
+      "checked": "17:15",
+      "elec": {
+        "status": "active",
+        "statusText": "Nearby fault — Parow / Goodwood Ext 1",
+        "note": "Kiosk burnt, started ~07:00 today. No restoration time given yet. Goodwood proper has no outage logged.",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/goodwood"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No active disruption",
+        "note": "",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/goodwood"
+      }
+    },
+    {
+      "id": "sitari",
+      "name": "Sitari",
+      "proxyNote": "not individually tracked — nearest monitored point: Macassar (Eskom, Block 8)",
+      "checked": "15:45",
+      "elec": {
+        "status": "planned",
+        "statusText": "Nearby planned maintenance — Somerset West",
+        "note": "Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar"
+      },
+      "water": {
+        "status": "active",
+        "statusText": "Active burst pipe — Kali Ave, Macassar",
+        "note": "Reported 08:00 today. City estimate for restoration: Sun 2 Aug, 15:00.",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar"
+      }
+    }
+  ]
+}
