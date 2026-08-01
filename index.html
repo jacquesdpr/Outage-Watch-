@@ -247,7 +247,7 @@
       <h3>Report a fault</h3>
       <p>City of Cape Town, 24/7: <span class="call">0860 103 089</span> · online at <a href="https://eservices1.capetown.gov.za/coct/wapl/zsreq_app/index.html" target="_blank" rel="noopener">eservices1.capetown.gov.za</a> · SMS "power" + account number to 31220.</p>
       <h3 style="margin-top:14px;">About this board</h3>
-      <p>This board pulls from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It refreshes itself automatically every minute; tap "Check power / water" on any card to jump to the live page for full detail.</p>
+      <p>This board pulls from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It refreshes itself automatically every hour; tap "Check power / water" on any card to jump to the live page for full detail.</p>
     </div>
   </div>
 
@@ -302,7 +302,7 @@
   </script>
   <script>
     var DATA_URL = 'data.json';
-    var REFRESH_MS = 60000;
+    var REFRESH_MS = 60 * 60000;
 
     function statusLabel(status) {
       if (status === 'active') return 'active';
