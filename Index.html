@@ -233,170 +233,13 @@
 <body>
   <div class="wrap">
     <div class="board-header">
-      <div class="eyebrow"><span class="dot-live"></span>SNAPSHOT · SAT 1 AUG 2026</div>
+      <div class="eyebrow"><span class="dot-live" id="live-dot"></span><span id="live-label">CONNECTING…</span></div>
       <h1>Outage Watch</h1>
       <p class="sub">Electricity &amp; water status for Burgundy Estate, Durbanville, Brackenfell, Goodwood and Sitari — read from the City of Cape Town's official service-alerts feed.</p>
-      <div class="summary-row">
-        <div class="chip"><b>3</b>&nbsp;areas clear</div>
-        <div class="chip warn"><b>1</b>&nbsp;planned outage tonight</div>
-        <div class="chip bad"><b>2</b>&nbsp;nearby faults to watch</div>
-      </div>
+      <div class="summary-row" id="summary-row"></div>
     </div>
 
-    <div class="list">
-
-      <!-- Burgundy Estate -->
-      <div class="card">
-        <div class="card-head">
-          <h2>Burgundy Estate</h2>
-          <span class="checked">checked 17:15</span>
-        </div>
-        <div class="rows">
-          <div class="row">
-            <span class="tag elec">ELEC</span>
-            <span class="status-led clear"></span>
-            <div class="row-text">
-              <div class="row-status clear">No outage reported by City</div>
-              <div class="row-note">1 resident flagged power off in the last 2 hrs — unconfirmed by the City yet, worth a follow-up check if it's you.</div>
-            </div>
-          </div>
-          <div class="row">
-            <span class="tag water">WATER</span>
-            <span class="status-led clear"></span>
-            <div class="row-text">
-              <div class="row-status clear">No active disruption</div>
-              <div class="row-note">Last burst (Cinnebar Street) was restored yesterday.</div>
-            </div>
-          </div>
-        </div>
-        <div class="card-foot">
-          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" target="_blank" rel="noopener">CHECK POWER →</a>
-          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate" target="_blank" rel="noopener">CHECK WATER →</a>
-        </div>
-      </div>
-
-      <!-- Durbanville -->
-      <div class="card">
-        <div class="card-head">
-          <h2>Durbanville</h2>
-          <span class="checked">checked 10:45</span>
-        </div>
-        <div class="rows">
-          <div class="row">
-            <span class="tag elec">ELEC</span>
-            <span class="status-led clear"></span>
-            <div class="row-text">
-              <div class="row-status clear">No outage reported by City</div>
-              <div class="row-note">Substation maintenance on Queen St / New St was restored yesterday.</div>
-            </div>
-          </div>
-          <div class="row">
-            <span class="tag water">WATER</span>
-            <span class="status-led clear"></span>
-            <div class="row-text">
-              <div class="row-status clear">No active disruption</div>
-              <div class="row-note">Durbanville averages ~1 burst main a week — check live if pressure drops.</div>
-            </div>
-          </div>
-        </div>
-        <div class="card-foot">
-          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/durbanville" target="_blank" rel="noopener">CHECK POWER →</a>
-          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/durbanville" target="_blank" rel="noopener">CHECK WATER →</a>
-        </div>
-      </div>
-
-      <!-- Brackenfell -->
-      <div class="card">
-        <div class="card-head">
-          <h2>Brackenfell</h2>
-          <span class="checked">checked 08:45</span>
-        </div>
-        <div class="rows">
-          <div class="row">
-            <span class="tag elec">ELEC</span>
-            <span class="status-led planned"></span>
-            <div class="row-text">
-              <div class="row-status planned">Planned outage tonight — Brackenfell Industria</div>
-              <div class="row-note">Substation maintenance, Brackengate: London Circle, Rome, Hamman &amp; Paris St. Sat 22:00 → Sun 14:00. Residential Brackenfell itself is unaffected.</div>
-            </div>
-          </div>
-          <div class="row">
-            <span class="tag water">WATER</span>
-            <span class="status-led clear"></span>
-            <div class="row-text">
-              <div class="row-status clear">No active disruption</div>
-            </div>
-          </div>
-        </div>
-        <div class="card-foot">
-          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/brackenfell" target="_blank" rel="noopener">CHECK POWER →</a>
-          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/brackenfell" target="_blank" rel="noopener">CHECK WATER →</a>
-        </div>
-      </div>
-
-      <!-- Goodwood -->
-      <div class="card">
-        <div class="card-head">
-          <h2>Goodwood</h2>
-          <span class="checked">checked 17:15</span>
-        </div>
-        <div class="rows">
-          <div class="row">
-            <span class="tag elec">ELEC</span>
-            <span class="status-led active"></span>
-            <div class="row-text">
-              <div class="row-status active">Nearby fault — Parow / Goodwood Ext 1</div>
-              <div class="row-note">Kiosk burnt, started ~07:00 today. No restoration time given yet. Goodwood proper has no outage logged.</div>
-            </div>
-          </div>
-          <div class="row">
-            <span class="tag water">WATER</span>
-            <span class="status-led clear"></span>
-            <div class="row-text">
-              <div class="row-status clear">No active disruption</div>
-            </div>
-          </div>
-        </div>
-        <div class="card-foot">
-          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/goodwood" target="_blank" rel="noopener">CHECK POWER →</a>
-          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/goodwood" target="_blank" rel="noopener">CHECK WATER →</a>
-        </div>
-      </div>
-
-      <!-- Sitari -->
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <h2>Sitari</h2>
-            <div class="proxy">not individually tracked — nearest monitored point: Macassar (Eskom, Block 8)</div>
-          </div>
-          <span class="checked">checked 15:45</span>
-        </div>
-        <div class="rows">
-          <div class="row">
-            <span class="tag elec">ELEC</span>
-            <span class="status-led planned"></span>
-            <div class="row-text">
-              <div class="row-status planned">Nearby planned maintenance — Somerset West</div>
-              <div class="row-note">Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.</div>
-            </div>
-          </div>
-          <div class="row">
-            <span class="tag water">WATER</span>
-            <span class="status-led active"></span>
-            <div class="row-text">
-              <div class="row-status active">Active burst pipe — Kali Ave, Macassar</div>
-              <div class="row-note">Reported 08:00 today. City estimate for restoration: Sun 2 Aug, 15:00.</div>
-            </div>
-          </div>
-        </div>
-        <div class="card-foot">
-          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/macassar" target="_blank" rel="noopener">CHECK POWER →</a>
-          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/macassar" target="_blank" rel="noopener">CHECK WATER →</a>
-        </div>
-      </div>
-
-    </div>
+    <div class="list" id="area-list"></div>
   </div>
 
   <div class="foot">
@@ -404,8 +247,145 @@
       <h3>Report a fault</h3>
       <p>City of Cape Town, 24/7: <span class="call">0860 103 089</span> · online at <a href="https://eservices1.capetown.gov.za/coct/wapl/zsreq_app/index.html" target="_blank" rel="noopener">eservices1.capetown.gov.za</a> · SMS "power" + account number to 31220.</p>
       <h3 style="margin-top:14px;">About this board</h3>
-      <p>This is a snapshot pulled from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It doesn't auto-refresh — tap "Check power / water" on any card for the live page, or just ask again later and status will be re-pulled fresh.</p>
+      <p>This board pulls from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It refreshes itself automatically every minute; tap "Check power / water" on any card to jump to the live page for full detail.</p>
     </div>
   </div>
+
+  <script type="application/json" id="fallback-data">
+{
+  "areas": [
+    {
+      "id": "burgundy-estate",
+      "name": "Burgundy Estate",
+      "checked": "17:15",
+      "elec": { "status": "clear", "statusText": "No outage reported by City", "note": "1 resident flagged power off in the last 2 hrs — unconfirmed by the City yet, worth a follow-up check if it's you.", "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" },
+      "water": { "status": "clear", "statusText": "No active disruption", "note": "Last burst (Cinnebar Street) was restored yesterday.", "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate" }
+    },
+    {
+      "id": "durbanville",
+      "name": "Durbanville",
+      "checked": "10:45",
+      "elec": { "status": "clear", "statusText": "No outage reported by City", "note": "Substation maintenance on Queen St / New St was restored yesterday.", "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville" },
+      "water": { "status": "clear", "statusText": "No active disruption", "note": "Durbanville averages ~1 burst main a week — check live if pressure drops.", "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville" }
+    },
+    {
+      "id": "brackenfell",
+      "name": "Brackenfell",
+      "checked": "08:45",
+      "elec": { "status": "planned", "statusText": "Planned outage tonight — Brackenfell Industria", "note": "Substation maintenance, Brackengate: London Circle, Rome, Hamman &amp; Paris St. Sat 22:00 → Sun 14:00. Residential Brackenfell itself is unaffected.", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
+      "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell" }
+    },
+    {
+      "id": "goodwood",
+      "name": "Goodwood",
+      "checked": "17:15",
+      "elec": { "status": "active", "statusText": "Nearby fault — Parow / Goodwood Ext 1", "note": "Kiosk burnt, started ~07:00 today. No restoration time given yet. Goodwood proper has no outage logged.", "link": "https://www.ourpower.co.za/power-outages/cape-town/goodwood" },
+      "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/goodwood" }
+    },
+    {
+      "id": "sitari",
+      "name": "Sitari",
+      "proxyNote": "not individually tracked — nearest monitored point: Macassar (Eskom, Block 8)",
+      "checked": "15:45",
+      "elec": { "status": "planned", "statusText": "Nearby planned maintenance — Somerset West", "note": "Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.", "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar" },
+      "water": { "status": "active", "statusText": "Active burst pipe — Kali Ave, Macassar", "note": "Reported 08:00 today. City estimate for restoration: Sun 2 Aug, 15:00.", "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar" }
+    }
+  ]
+}
+  </script>
+  <script>
+    var DATA_URL = 'data.json';
+    var REFRESH_MS = 60000;
+
+    function statusLabel(status) {
+      if (status === 'active') return 'active';
+      if (status === 'planned') return 'planned';
+      return 'clear';
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function rowHtml(tag, entry) {
+      var st = statusLabel(entry.status);
+      var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
+      return '' +
+        '<div class="row">' +
+          '<span class="tag ' + tag + '">' + tag.toUpperCase() + '</span>' +
+          '<span class="status-led ' + st + '"></span>' +
+          '<div class="row-text">' +
+            '<div class="row-status ' + st + '">' + entry.statusText + '</div>' +
+            note +
+          '</div>' +
+        '</div>';
+    }
+
+    function cardHtml(area) {
+      var head = area.proxyNote
+        ? '<div><h2>' + escapeHtml(area.name) + '</h2><div class="proxy">' + escapeHtml(area.proxyNote) + '</div></div>'
+        : '<h2>' + escapeHtml(area.name) + '</h2>';
+      return '' +
+        '<div class="card">' +
+          '<div class="card-head">' + head + '<span class="checked">checked ' + escapeHtml(area.checked) + '</span></div>' +
+          '<div class="rows">' + rowHtml('elec', area.elec) + rowHtml('water', area.water) + '</div>' +
+          '<div class="card-foot">' +
+            '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener">CHECK POWER →</a>' +
+            '<a class="btn water" href="' + area.water.link + '" target="_blank" rel="noopener">CHECK WATER →</a>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function summaryHtml(areas) {
+      var clearAreas = 0, planned = 0, active = 0;
+      areas.forEach(function (a) {
+        if (a.elec.status !== 'active' && a.water.status !== 'active') clearAreas++;
+        [a.elec, a.water].forEach(function (e) {
+          if (e.status === 'planned') planned++;
+          if (e.status === 'active') active++;
+        });
+      });
+      return '' +
+        '<div class="chip"><b>' + clearAreas + '</b>&nbsp;areas clear</div>' +
+        '<div class="chip warn"><b>' + planned + '</b>&nbsp;planned outage' + (planned === 1 ? '' : 's') + '</div>' +
+        '<div class="chip bad"><b>' + active + '</b>&nbsp;nearby fault' + (active === 1 ? '' : 's') + ' to watch</div>';
+    }
+
+    function render(data) {
+      document.getElementById('summary-row').innerHTML = summaryHtml(data.areas);
+      document.getElementById('area-list').innerHTML = data.areas.map(cardHtml).join('');
+    }
+
+    function setLiveIndicator(ok) {
+      var dot = document.getElementById('live-dot');
+      var label = document.getElementById('live-label');
+      var time = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      if (ok) {
+        dot.style.background = 'var(--clear)';
+        label.textContent = 'LIVE · updated ' + time;
+      } else {
+        dot.style.background = 'var(--planned)';
+        label.textContent = 'STATIC SNAPSHOT · live fetch unavailable';
+      }
+    }
+
+    // fetch() of a local data.json fails under file:// (CORS), so a baked-in
+    // copy guarantees the board still renders when opened directly as a file.
+    var fallbackData = JSON.parse(document.getElementById('fallback-data').textContent);
+    render(fallbackData);
+    setLiveIndicator(false);
+
+    function loadLive() {
+      fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (res) { if (!res.ok) throw new Error('bad status'); return res.json(); })
+        .then(function (data) { render(data); setLiveIndicator(true); })
+        .catch(function () { setLiveIndicator(false); });
+    }
+
+    loadLive();
+    setInterval(loadLive, REFRESH_MS);
+  </script>
 </body>
 </html>
