@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outage Watch — Northern &amp; Helderberg Suburbs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12161d;
+    --panel: #1b212a;
+    --panel-hi: #212834;
+    --line: #2a323e;
+    --text: #edf0f4;
+    --muted: #8c94a3;
+    --elec: #f0a93b;
+    --water: #3fb6c9;
+    --clear: #49d67f;
+    --active: #f0603f;
+    --planned: #f0a93b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 800px at 50% -10%, #1a2029 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 48px;
+  }
+  .wrap{ max-width: 560px; margin: 0 auto; padding: 22px 16px 0; }
+
+  /* header */
+  .board-header{
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--panel-hi), var(--panel));
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .board-header::before{
+    content:"";
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 24px);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display:flex; align-items:center; gap:8px;
+  }
+  .dot-live{
+    width:7px; height:7px; border-radius:50%;
+    background: var(--clear);
+    box-shadow: 0 0 0 3px rgba(73,214,127,0.15);
+  }
+  h1{
+    font-family:'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: .01em;
+    margin: 6px 0 4px;
+    text-transform: uppercase;
+  }
+  .sub{
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 14px;
+  }
+  .summary-row{
+    display:flex; gap:8px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+  }
+  .chip{
+    border:1px solid var(--line);
+    background: rgba(255,255,255,0.02);
+    border-radius: 999px;
+    padding: 6px 10px;
+    display:flex; align-items:center; gap:6px;
+    color: var(--muted);
+  }
+  .chip b{ color: var(--text); font-weight:600; }
+  .chip.warn b{ color: var(--planned); }
+  .chip.bad b{ color: var(--active); }
+
+  /* area list */
+  .list{ margin-top: 18px; display:flex; flex-direction:column; gap:12px; }
+
+  .card{
+    border:1px solid var(--line);
+    background: var(--panel);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .card-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .card-head h2{
+    font-family:'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight:600;
+    margin:0;
+    text-transform: uppercase;
+    letter-spacing:.01em;
+  }
+  .card-head .proxy{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .checked{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    white-space:nowrap;
+  }
+
+  .rows{ padding: 4px 16px 12px; }
+  .row{
+    display:flex; align-items:flex-start; gap:10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .row:last-child{ border-bottom:none; }
+  .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    font-weight:600;
+    letter-spacing:.06em;
+    width: 46px;
+    padding-top: 2px;
+    flex-shrink:0;
+  }
+  .tag.elec{ color: var(--elec); }
+  .tag.water{ color: var(--water); }
+
+  .status-led{
+    width: 9px; height: 9px; border-radius:50%;
+    margin-top: 4px;
+    flex-shrink:0;
+  }
+  .status-led.clear{ background: var(--clear); box-shadow: 0 0 8px rgba(73,214,127,.6); }
+  .status-led.active{ background: var(--active); box-shadow: 0 0 8px rgba(240,96,63,.7); animation: pulse 1.6s infinite; }
+  .status-led.planned{ background: var(--planned); box-shadow: 0 0 8px rgba(240,169,59,.6); }
+
+  @keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.35; }
+  }
+
+  .row-text{ flex:1; }
+  .row-status{
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height:1.35;
+  }
+  .row-status.clear{ color: var(--text); }
+  .row-status.active{ color: #ffb3a0; }
+  .row-status.planned{ color: #ffd58a; }
+  .row-note{
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height:1.4;
+  }
+
+  .card-foot{
+    display:flex; gap:8px;
+    padding: 10px 16px 14px;
+  }
+  .btn{
+    flex:1;
+    text-align:center;
+    text-decoration:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing:.03em;
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 8px;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .btn:active{ background: rgba(255,255,255,0.08); }
+  .btn.elec{ border-color: rgba(240,169,59,0.35); }
+  .btn.water{ border-color: rgba(63,182,201,0.35); }
+
+  /* footer */
+  .foot{
+    max-width:560px; margin: 20px auto 0; padding: 0 16px;
+  }
+  .foot-panel{
+    border:1px solid var(--line);
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .foot-panel h3{
+    font-family:'Oswald', sans-serif;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin: 0 0 8px;
+    color: var(--muted);
+  }
+  .foot-panel p{
+    font-size: 12.5px;
+    line-height:1.6;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .foot-panel p:last-child{ margin-bottom:0; }
+  .foot-panel a{ color: var(--water); text-decoration:none; }
+  .call{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--text);
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="board-header">
+      <div class="eyebrow"><span class="dot-live"></span>SNAPSHOT · SAT 1 AUG 2026</div>
+      <h1>Outage Watch</h1>
+      <p class="sub">Electricity &amp; water status for Burgundy Estate, Durbanville, Brackenfell, Goodwood and Sitari — read from the City of Cape Town's official service-alerts feed.</p>
+      <div class="summary-row">
+        <div class="chip"><b>3</b>&nbsp;areas clear</div>
+        <div class="chip warn"><b>1</b>&nbsp;planned outage tonight</div>
+        <div class="chip bad"><b>2</b>&nbsp;nearby faults to watch</div>
+      </div>
+    </div>
+
+    <div class="list">
+
+      <!-- Burgundy Estate -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Burgundy Estate</h2>
+          <span class="checked">checked 17:15</span>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <span class="tag elec">ELEC</span>
+            <span class="status-led clear"></span>
+            <div class="row-text">
+              <div class="row-status clear">No outage reported by City</div>
+              <div class="row-note">1 resident flagged power off in the last 2 hrs — unconfirmed by the City yet, worth a follow-up check if it's you.</div>
+            </div>
+          </div>
+          <div class="row">
+            <span class="tag water">WATER</span>
+            <span class="status-led clear"></span>
+            <div class="row-text">
+              <div class="row-status clear">No active disruption</div>
+              <div class="row-note">Last burst (Cinnebar Street) was restored yesterday.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" target="_blank" rel="noopener">CHECK POWER →</a>
+          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate" target="_blank" rel="noopener">CHECK WATER →</a>
+        </div>
+      </div>
+
+      <!-- Durbanville -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Durbanville</h2>
+          <span class="checked">checked 10:45</span>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <span class="tag elec">ELEC</span>
+            <span class="status-led clear"></span>
+            <div class="row-text">
+              <div class="row-status clear">No outage reported by City</div>
+              <div class="row-note">Substation maintenance on Queen St / New St was restored yesterday.</div>
+            </div>
+          </div>
+          <div class="row">
+            <span class="tag water">WATER</span>
+            <span class="status-led clear"></span>
+            <div class="row-text">
+              <div class="row-status clear">No active disruption</div>
+              <div class="row-note">Durbanville averages ~1 burst main a week — check live if pressure drops.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/durbanville" target="_blank" rel="noopener">CHECK POWER →</a>
+          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/durbanville" target="_blank" rel="noopener">CHECK WATER →</a>
+        </div>
+      </div>
+
+      <!-- Brackenfell -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Brackenfell</h2>
+          <span class="checked">checked 08:45</span>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <span class="tag elec">ELEC</span>
+            <span class="status-led planned"></span>
+            <div class="row-text">
+              <div class="row-status planned">Planned outage tonight — Brackenfell Industria</div>
+              <div class="row-note">Substation maintenance, Brackengate: London Circle, Rome, Hamman &amp; Paris St. Sat 22:00 → Sun 14:00. Residential Brackenfell itself is unaffected.</div>
+            </div>
+          </div>
+          <div class="row">
+            <span class="tag water">WATER</span>
+            <span class="status-led clear"></span>
+            <div class="row-text">
+              <div class="row-status clear">No active disruption</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/brackenfell" target="_blank" rel="noopener">CHECK POWER →</a>
+          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/brackenfell" target="_blank" rel="noopener">CHECK WATER →</a>
+        </div>
+      </div>
+
+      <!-- Goodwood -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Goodwood</h2>
+          <span class="checked">checked 17:15</span>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <span class="tag elec">ELEC</span>
+            <span class="status-led active"></span>
+            <div class="row-text">
+              <div class="row-status active">Nearby fault — Parow / Goodwood Ext 1</div>
+              <div class="row-note">Kiosk burnt, started ~07:00 today. No restoration time given yet. Goodwood proper has no outage logged.</div>
+            </div>
+          </div>
+          <div class="row">
+            <span class="tag water">WATER</span>
+            <span class="status-led clear"></span>
+            <div class="row-text">
+              <div class="row-status clear">No active disruption</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/goodwood" target="_blank" rel="noopener">CHECK POWER →</a>
+          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/goodwood" target="_blank" rel="noopener">CHECK WATER →</a>
+        </div>
+      </div>
+
+      <!-- Sitari -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Sitari</h2>
+            <div class="proxy">not individually tracked — nearest monitored point: Macassar (Eskom, Block 8)</div>
+          </div>
+          <span class="checked">checked 15:45</span>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <span class="tag elec">ELEC</span>
+            <span class="status-led planned"></span>
+            <div class="row-text">
+              <div class="row-status planned">Nearby planned maintenance — Somerset West</div>
+              <div class="row-note">Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.</div>
+            </div>
+          </div>
+          <div class="row">
+            <span class="tag water">WATER</span>
+            <span class="status-led active"></span>
+            <div class="row-text">
+              <div class="row-status active">Active burst pipe — Kali Ave, Macassar</div>
+              <div class="row-note">Reported 08:00 today. City estimate for restoration: Sun 2 Aug, 15:00.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <a class="btn elec" href="https://www.ourpower.co.za/power-outages/cape-town/macassar" target="_blank" rel="noopener">CHECK POWER →</a>
+          <a class="btn water" href="https://www.ourpower.co.za/water-outages/cape-town/macassar" target="_blank" rel="noopener">CHECK WATER →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="foot-panel">
+      <h3>Report a fault</h3>
+      <p>City of Cape Town, 24/7: <span class="call">0860 103 089</span> · online at <a href="https://eservices1.capetown.gov.za/coct/wapl/zsreq_app/index.html" target="_blank" rel="noopener">eservices1.capetown.gov.za</a> · SMS "power" + account number to 31220.</p>
+      <h3 style="margin-top:14px;">About this board</h3>
+      <p>This is a snapshot pulled from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It doesn't auto-refresh — tap "Check power / water" on any card for the live page, or just ask again later and status will be re-pulled fresh.</p>
+    </div>
+  </div>
+</body>
+</html>
