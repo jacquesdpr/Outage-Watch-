@@ -69,6 +69,23 @@
       }
     },
     {
+      "id": "cape-town-cbd",
+      "name": "Cape Town CBD",
+      "checked": "18:00",
+      "elec": {
+        "status": "clear",
+        "statusText": "No outage reported by City",
+        "note": "",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/cape-town-city-centre"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No active disruption",
+        "note": "",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/cape-town-city-centre"
+      }
+    },
+    {
       "id": "sitari",
       "name": "Sitari",
       "proxyNote": "not individually tracked — nearest monitored point: Macassar (Eskom, Block 8)",
