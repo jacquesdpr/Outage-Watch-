@@ -36,23 +36,6 @@
       }
     },
     {
-      "id": "cape-town-cbd",
-      "name": "Cape Town CBD",
-      "checked": "18:00",
-      "elec": {
-        "status": "clear",
-        "statusText": "No outage reported by City",
-        "note": "",
-        "link": "https://www.ourpower.co.za/power-outages/cape-town/cape-town-city-centre"
-      },
-      "water": {
-        "status": "clear",
-        "statusText": "No active disruption",
-        "note": "",
-        "link": "https://www.ourpower.co.za/water-outages/cape-town/cape-town-city-centre"
-      }
-    },
-    {
       "id": "durbanville",
       "name": "Durbanville",
       "checked": "10:45",
@@ -67,23 +50,6 @@
         "statusText": "No active disruption",
         "note": "Durbanville averages ~1 burst main a week — check live if pressure drops.",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville"
-      }
-    },
-    {
-      "id": "goodwood",
-      "name": "Goodwood",
-      "checked": "17:15",
-      "elec": {
-        "status": "active",
-        "statusText": "Nearby fault — Parow / Goodwood Ext 1",
-        "note": "Kiosk burnt, started ~07:00 today. No restoration time given yet. Goodwood proper has no outage logged.",
-        "link": "https://www.ourpower.co.za/power-outages/cape-town/goodwood"
-      },
-      "water": {
-        "status": "clear",
-        "statusText": "No active disruption",
-        "note": "",
-        "link": "https://www.ourpower.co.za/water-outages/cape-town/goodwood"
       }
     },
     {
