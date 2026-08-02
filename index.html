@@ -119,13 +119,6 @@
     text-transform:none;
     letter-spacing:0;
   }
-  .checked{
-    font-family:'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    color: var(--muted);
-    white-space:nowrap;
-  }
-
   .rows{ padding: 4px 16px 12px; }
   .row{
     display:flex; align-items:flex-start; gap:10px;
@@ -262,7 +255,6 @@
 
   <script type="application/json" id="fallback-data">
 {
-  "checked": "15:45",
   "areas": [
     {
       "id": "brackenfell",
@@ -323,13 +315,13 @@
         '</div>';
     }
 
-    function cardHtml(area, checkedTime) {
+    function cardHtml(area) {
       var head = area.proxyNote
         ? '<div><h2>' + escapeHtml(area.name) + '</h2><div class="proxy">' + escapeHtml(area.proxyNote) + '</div></div>'
         : '<h2>' + escapeHtml(area.name) + '</h2>';
       return '' +
         '<div class="card">' +
-          '<div class="card-head">' + head + '<span class="checked">checked ' + escapeHtml(checkedTime) + '</span></div>' +
+          '<div class="card-head">' + head + '</div>' +
           '<div class="rows">' + rowHtml('elec', area.elec) + rowHtml('water', area.water) + '</div>' +
           '<div class="card-foot">' +
             '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener">CHECK POWER →</a>' +
@@ -355,9 +347,7 @@
 
     function render(data) {
       document.getElementById('summary-row').innerHTML = summaryHtml(data.areas);
-      document.getElementById('area-list').innerHTML = data.areas.map(function (a) {
-        return cardHtml(a, data.checked);
-      }).join('');
+      document.getElementById('area-list').innerHTML = data.areas.map(cardHtml).join('');
     }
 
     function setLiveIndicator(ok) {
