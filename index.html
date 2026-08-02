@@ -262,6 +262,7 @@
 
   <script type="application/json" id="fallback-data">
 {
+  "checked": "2026-08-02 15:45",
   "areas": [
     {
       "id": "brackenfell",
@@ -352,14 +353,10 @@
         '<div class="chip bad"><b>' + active + '</b>&nbsp;nearby fault' + (active === 1 ? '' : 's') + ' to watch</div>';
     }
 
-    function formatCheckedTime(d) {
-      return d.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function render(data, checkedTime) {
+    function render(data) {
       document.getElementById('summary-row').innerHTML = summaryHtml(data.areas);
       document.getElementById('area-list').innerHTML = data.areas.map(function (a) {
-        return cardHtml(a, checkedTime);
+        return cardHtml(a, data.checked);
       }).join('');
     }
 
@@ -369,7 +366,7 @@
       var time = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       if (ok) {
         dot.style.background = 'var(--clear)';
-        label.textContent = 'LIVE · updated ' + time;
+        label.textContent = 'LIVE · fetched ' + time;
       } else {
         dot.style.background = 'var(--planned)';
         label.textContent = 'STATIC SNAPSHOT · live fetch unavailable';
@@ -379,13 +376,13 @@
     // fetch() of a local data.json fails under file:// (CORS), so a baked-in
     // copy guarantees the board still renders when opened directly as a file.
     var fallbackData = JSON.parse(document.getElementById('fallback-data').textContent);
-    render(fallbackData, formatCheckedTime(new Date()));
+    render(fallbackData);
     setLiveIndicator(false);
 
     function loadLive() {
       fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' })
         .then(function (res) { if (!res.ok) throw new Error('bad status'); return res.json(); })
-        .then(function (data) { render(data, formatCheckedTime(new Date())); setLiveIndicator(true); })
+        .then(function (data) { render(data); setLiveIndicator(true); })
         .catch(function () { setLiveIndicator(false); });
     }
 
