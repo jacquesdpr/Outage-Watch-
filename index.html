@@ -144,6 +144,14 @@
   }
   .tag.elec{ color: var(--elec); }
   .tag.water{ color: var(--water); }
+  .tag-provider{
+    display:block;
+    font-size: 8px;
+    font-weight:500;
+    letter-spacing:0;
+    color: var(--muted);
+    margin-top: 2px;
+  }
 
   .status-led{
     width: 9px; height: 9px; border-radius:50%;
@@ -248,6 +256,7 @@
       <p>City of Cape Town, 24/7: <span class="call">0860 103 089</span> · online at <a href="https://eservices1.capetown.gov.za/coct/wapl/zsreq_app/index.html" target="_blank" rel="noopener">eservices1.capetown.gov.za</a> · SMS "power" + account number to 31220.</p>
       <h3 style="margin-top:14px;">About this board</h3>
       <p>This board pulls from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It refreshes itself automatically every hour; tap "Check power / water" on any card to jump to the live page for full detail.</p>
+      <p>Burgundy Estate and Sitari are supplied directly by Eskom rather than the City of Cape Town — marked "Eskom" under the ELEC tag on those cards — so their power status reflects Eskom's own outage reporting, not the City's feed.</p>
     </div>
   </div>
 
@@ -258,7 +267,7 @@
       "id": "burgundy-estate",
       "name": "Burgundy Estate",
       "checked": "17:15",
-      "elec": { "status": "clear", "statusText": "No outage reported by City", "note": "1 resident flagged power off in the last 2 hrs — unconfirmed by the City yet, worth a follow-up check if it's you.", "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" },
+      "elec": { "status": "clear", "provider": "Eskom", "statusText": "No outage reported by Eskom", "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town — 1 resident flagged power off in the last 2 hrs, unconfirmed yet, worth a follow-up check if it's you.", "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" },
       "water": { "status": "clear", "statusText": "No active disruption", "note": "Last burst (Cinnebar Street) was restored yesterday.", "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate" }
     },
     {
@@ -294,7 +303,7 @@
       "name": "Sitari",
       "proxyNote": "not individually tracked — nearest monitored point: Macassar (Eskom, Block 8)",
       "checked": "15:45",
-      "elec": { "status": "planned", "statusText": "Nearby planned maintenance — Somerset West", "note": "Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.", "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar" },
+      "elec": { "status": "planned", "provider": "Eskom", "statusText": "Nearby planned maintenance — Somerset West", "note": "Sitari is supplied directly by Eskom, not the City of Cape Town. Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.", "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar" },
       "water": { "status": "active", "statusText": "Active burst pipe — Kali Ave, Macassar", "note": "Reported 08:00 today. City estimate for restoration: Sun 2 Aug, 15:00.", "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar" }
     }
   ]
@@ -319,9 +328,10 @@
     function rowHtml(tag, entry) {
       var st = statusLabel(entry.status);
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
+      var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
         '<div class="row">' +
-          '<span class="tag ' + tag + '">' + tag.toUpperCase() + '</span>' +
+          '<span class="tag ' + tag + '">' + tag.toUpperCase() + provider + '</span>' +
           '<span class="status-led ' + st + '"></span>' +
           '<div class="row-text">' +
             '<div class="row-status ' + st + '">' + entry.statusText + '</div>' +

@@ -6,8 +6,9 @@
       "checked": "17:15",
       "elec": {
         "status": "clear",
-        "statusText": "No outage reported by City",
-        "note": "1 resident flagged power off in the last 2 hrs — unconfirmed by the City yet, worth a follow-up check if it's you.",
+        "provider": "Eskom",
+        "statusText": "No outage reported by Eskom",
+        "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town — 1 resident flagged power off in the last 2 hrs, unconfirmed yet, worth a follow-up check if it's you.",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate"
       },
       "water": {
@@ -92,8 +93,9 @@
       "checked": "15:45",
       "elec": {
         "status": "planned",
+        "provider": "Eskom",
         "statusText": "Nearby planned maintenance — Somerset West",
-        "note": "Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.",
+        "note": "Sitari is supplied directly by Eskom, not the City of Cape Town. Medium-voltage switchgear work today 04:00–16:00 on Pacific St, Church St, Reitz St, Lourens St &amp; Victoria St. Macassar itself has no outage logged.",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar"
       },
       "water": {
