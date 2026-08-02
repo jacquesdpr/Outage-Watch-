@@ -3,7 +3,6 @@
     {
       "id": "brackenfell",
       "name": "Brackenfell",
-      "checked": "08:45",
       "elec": {
         "status": "planned",
         "statusText": "Planned outage tonight — Brackenfell Industria",
@@ -20,7 +19,6 @@
     {
       "id": "burgundy-estate",
       "name": "Burgundy Estate",
-      "checked": "17:15",
       "elec": {
         "status": "clear",
         "provider": "Eskom",
@@ -38,7 +36,6 @@
     {
       "id": "durbanville",
       "name": "Durbanville",
-      "checked": "10:45",
       "elec": {
         "status": "clear",
         "statusText": "No outage reported by City",
@@ -56,7 +53,6 @@
       "id": "sitari",
       "name": "Sitari",
       "proxyNote": "not individually tracked — nearest monitored point: Croydon",
-      "checked": "18:00",
       "elec": {
         "status": "clear",
         "provider": "Eskom",
