@@ -265,27 +265,27 @@
     {
       "id": "brackenfell",
       "name": "Brackenfell",
-      "elec": { "status": "clear", "statusText": "No power outage reported in Brackenfell by the City", "note": "", "checked": "2026-08-04 06:15", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
-      "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell" }
+      "elec": { "status": "clear", "statusText": "No power outage reported in Brackenfell by the City", "note": "", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
+      "water": { "status": "clear", "statusText": "No water outage reported in Brackenfell", "note": "", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell" }
     },
     {
       "id": "burgundy-estate",
       "name": "Burgundy Estate",
-      "elec": { "status": "clear", "provider": "Eskom", "statusText": "No outage reported by Eskom", "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town.", "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" },
-      "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate" }
+      "elec": { "status": "clear", "provider": "Eskom", "statusText": "No power outage reported in Burgundy Estate by the City", "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town.", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate" },
+      "water": { "status": "clear", "statusText": "No water outage reported in Burgundy Estate", "note": "", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate" }
     },
     {
       "id": "durbanville",
       "name": "Durbanville",
-      "elec": { "status": "clear", "statusText": "No outage reported by City", "note": "", "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville" },
-      "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville" }
+      "elec": { "status": "clear", "statusText": "No power outage reported in Durbanville by the City", "note": "", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville" },
+      "water": { "status": "clear", "statusText": "No water outage reported in Durbanville", "note": "", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville" }
     },
     {
       "id": "sitari",
       "name": "Sitari",
       "proxyNote": "not individually tracked — nearest monitored point: Macassar",
-      "elec": { "status": "clear", "provider": "Eskom", "statusText": "No outage reported by Eskom", "note": "Sitari is supplied directly by Eskom, not the City of Cape Town.", "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar" },
-      "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar" }
+      "elec": { "status": "clear", "provider": "Eskom", "statusText": "No power outage reported in Macassar by the City", "note": "Sitari is supplied directly by Eskom, not the City of Cape Town.", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar" },
+      "water": { "status": "active", "statusText": "Water outage in Macassar - reported 19 hours ago", "note": "Burst Water Main - C/O Kramat Road & N2", "checked": "2026-08-04 06:46", "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar" }
     }
   ]
 }
@@ -390,10 +390,14 @@
     // Best-effort "check on click": when CHECK POWER/WATER is pressed, the
     // link still opens the source page in a new tab as normal, but this also
     // tries to fetch + parse that same page in the background and update the
-    // row live. OurPower.co.za has no public API, so this depends on the
-    // browser's CORS policy allowing a cross-origin read — if it's blocked
-    // (likely, since the site doesn't advertise CORS support), this just
-    // fails quietly and the row is left as-is.
+    // row live. A direct fetch() of OurPower.co.za is blocked by the
+    // browser's CORS policy (confirmed — the site advertises no cross-origin
+    // support), so this routes through allorigins.win, a public CORS-proxy
+    // relay, to get a readable response. That's a third-party dependency
+    // outside our control: if it's down, rate-limited, or changes behavior,
+    // this fails quietly and the row is left as-is.
+    var CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
     function setRowChecking(areaId, tag) {
       var row = document.querySelector('[data-row="' + areaId + '-' + tag + '"]');
       if (!row) return null;
@@ -442,7 +446,7 @@
       var row = setRowChecking(areaId, tag);
       if (!row) return;
 
-      fetch(btn.href)
+      fetch(CORS_PROXY + encodeURIComponent(btn.href))
         .then(function (res) { if (!res.ok) throw new Error('bad status'); return res.text(); })
         .then(function (html) {
           var parsed = parseOurPowerPage(html, tag);
