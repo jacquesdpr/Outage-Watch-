@@ -1,18 +1,18 @@
 {
-  "checked": "2026-08-04 06:29",
+  "checked": "2026-08-04 04:08",
   "areas": [
     {
       "id": "brackenfell",
       "name": "Brackenfell",
       "elec": {
-        "status": "planned",
-        "statusText": "Power Outage inBrackenfell, Cape Town",
+        "status": "clear",
+        "statusText": "No outage reported by City",
         "note": "",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
-        "status": "planned",
-        "statusText": "Water Outage inBrackenfell, Cape Town",
+        "status": "clear",
+        "statusText": "No active disruption",
         "note": "",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell"
       }
@@ -21,15 +21,15 @@
       "id": "burgundy-estate",
       "name": "Burgundy Estate",
       "elec": {
-        "status": "planned",
+        "status": "clear",
         "provider": "Eskom",
-        "statusText": "Power Outage inBurgundy Estate, Cape Town",
+        "statusText": "No outage reported by Eskom",
         "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town.",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate"
       },
       "water": {
-        "status": "planned",
-        "statusText": "Water Outage inBurgundy Estate, Cape Town",
+        "status": "clear",
+        "statusText": "No active disruption",
         "note": "",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate"
       }
@@ -38,14 +38,14 @@
       "id": "durbanville",
       "name": "Durbanville",
       "elec": {
-        "status": "planned",
-        "statusText": "Power Outage inDurbanville, Cape Town",
+        "status": "clear",
+        "statusText": "No outage reported by City",
         "note": "",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville"
       },
       "water": {
-        "status": "planned",
-        "statusText": "Water Outage inDurbanville, Cape Town",
+        "status": "clear",
+        "statusText": "No active disruption",
         "note": "",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville"
       }
@@ -55,15 +55,15 @@
       "name": "Sitari",
       "proxyNote": "not individually tracked — nearest monitored point: Macassar",
       "elec": {
-        "status": "planned",
+        "status": "clear",
         "provider": "Eskom",
-        "statusText": "Power Outage inMacassar, Cape Town",
+        "statusText": "No outage reported by Eskom",
         "note": "Sitari is supplied directly by Eskom, not the City of Cape Town.",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar"
       },
       "water": {
-        "status": "planned",
-        "statusText": "Water Outage inMacassar, Cape Town",
+        "status": "clear",
+        "statusText": "No active disruption",
         "note": "",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar"
       }
