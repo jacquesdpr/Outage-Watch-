@@ -119,12 +119,6 @@
     text-transform:none;
     letter-spacing:0;
   }
-  .checked{
-    font-family:'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    color: var(--muted);
-    white-space:nowrap;
-  }
   .rows{ padding: 4px 16px 12px; }
   .row{
     display:flex; align-items:flex-start; gap:10px;
@@ -175,6 +169,12 @@
   .row-status.clear{ color: var(--text); }
   .row-status.active{ color: #ffb3a0; }
   .row-status.planned{ color: #ffd58a; }
+  .row-checked{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
   .row-note{
     font-size: 12px;
     color: var(--muted);
@@ -261,12 +261,11 @@
 
   <script type="application/json" id="fallback-data">
 {
-  "checked": "2026-08-04 04:08",
   "areas": [
     {
       "id": "brackenfell",
       "name": "Brackenfell",
-      "elec": { "status": "clear", "statusText": "No outage reported by City", "note": "", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
+      "elec": { "status": "clear", "statusText": "No power outage reported in Brackenfell by the City", "note": "", "checked": "2026-08-04 06:15", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
       "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell" }
     },
     {
@@ -307,32 +306,34 @@
       });
     }
 
-    function rowHtml(tag, entry) {
+    function rowHtml(tag, entry, areaId) {
       var st = statusLabel(entry.status);
+      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + '</div>' : '';
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
       var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
-        '<div class="row">' +
+        '<div class="row" data-row="' + areaId + '-' + tag + '">' +
           '<span class="tag ' + tag + '">' + tag.toUpperCase() + provider + '</span>' +
           '<span class="status-led ' + st + '"></span>' +
           '<div class="row-text">' +
             '<div class="row-status ' + st + '">' + entry.statusText + '</div>' +
+            checked +
             note +
           '</div>' +
         '</div>';
     }
 
-    function cardHtml(area, checkedTime) {
+    function cardHtml(area) {
       var head = area.proxyNote
         ? '<div><h2>' + escapeHtml(area.name) + '</h2><div class="proxy">' + escapeHtml(area.proxyNote) + '</div></div>'
         : '<h2>' + escapeHtml(area.name) + '</h2>';
       return '' +
         '<div class="card">' +
-          '<div class="card-head">' + head + '<span class="checked">checked ' + escapeHtml(checkedTime) + '</span></div>' +
-          '<div class="rows">' + rowHtml('elec', area.elec) + rowHtml('water', area.water) + '</div>' +
+          '<div class="card-head">' + head + '</div>' +
+          '<div class="rows">' + rowHtml('elec', area.elec, area.id) + rowHtml('water', area.water, area.id) + '</div>' +
           '<div class="card-foot">' +
-            '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener">CHECK POWER →</a>' +
-            '<a class="btn water" href="' + area.water.link + '" target="_blank" rel="noopener">CHECK WATER →</a>' +
+            '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener" data-area-id="' + area.id + '" data-service="elec">CHECK POWER →</a>' +
+            '<a class="btn water" href="' + area.water.link + '" target="_blank" rel="noopener" data-area-id="' + area.id + '" data-service="water">CHECK WATER →</a>' +
           '</div>' +
         '</div>';
     }
@@ -354,9 +355,7 @@
 
     function render(data) {
       document.getElementById('summary-row').innerHTML = summaryHtml(data.areas);
-      document.getElementById('area-list').innerHTML = data.areas.map(function (a) {
-        return cardHtml(a, data.checked);
-      }).join('');
+      document.getElementById('area-list').innerHTML = data.areas.map(cardHtml).join('');
     }
 
     function setLiveIndicator(ok) {
@@ -387,6 +386,74 @@
 
     loadLive();
     setInterval(loadLive, REFRESH_MS);
+
+    // Best-effort "check on click": when CHECK POWER/WATER is pressed, the
+    // link still opens the source page in a new tab as normal, but this also
+    // tries to fetch + parse that same page in the background and update the
+    // row live. OurPower.co.za has no public API, so this depends on the
+    // browser's CORS policy allowing a cross-origin read — if it's blocked
+    // (likely, since the site doesn't advertise CORS support), this just
+    // fails quietly and the row is left as-is.
+    function setRowChecking(areaId, tag) {
+      var row = document.querySelector('[data-row="' + areaId + '-' + tag + '"]');
+      if (!row) return null;
+      var checkedEl = row.querySelector('.row-checked');
+      if (!checkedEl) {
+        checkedEl = document.createElement('div');
+        checkedEl.className = 'row-checked';
+        row.querySelector('.row-status').insertAdjacentElement('afterend', checkedEl);
+      }
+      checkedEl.textContent = 'Checking…';
+      return row;
+    }
+
+    function applyLiveCheck(row, status, statusText, checkedRaw) {
+      var st = statusLabel(status);
+      var led = row.querySelector('.status-led');
+      led.className = 'status-led ' + st;
+      var statusEl = row.querySelector('.row-status');
+      statusEl.className = 'row-status ' + st;
+      statusEl.textContent = statusText;
+      var checkedEl = row.querySelector('.row-checked');
+      checkedEl.textContent = 'Last checked: ' + checkedRaw;
+    }
+
+    function parseOurPowerPage(html, tag) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var text = doc.body.textContent.replace(/\s+/g, ' ').trim();
+      var match = text.match(/([^.]*?outage[^.]*?)\.?\s*Last checked:\s*(\d{1,2} \w+ \d{4} at \d{1,2}:\d{2})/i);
+      if (!match) return null;
+      var sentence = match[1].trim();
+      var checkedRaw = match[2];
+      var service = tag === 'water' ? 'water' : 'power';
+      var status = new RegExp('no\\s+' + service + '\\s+outage\\s+reported', 'i').test(sentence)
+        ? 'clear'
+        : (/planned/i.test(sentence) ? 'planned' : 'active');
+      return { status: status, statusText: sentence, checkedRaw: checkedRaw };
+    }
+
+    document.getElementById('area-list').addEventListener('click', function (e) {
+      var btn = e.target.closest('.btn');
+      if (!btn) return;
+      var areaId = btn.dataset.areaId;
+      var tag = btn.dataset.service;
+      if (!areaId || !tag) return;
+
+      var row = setRowChecking(areaId, tag);
+      if (!row) return;
+
+      fetch(btn.href)
+        .then(function (res) { if (!res.ok) throw new Error('bad status'); return res.text(); })
+        .then(function (html) {
+          var parsed = parseOurPowerPage(html, tag);
+          if (!parsed) throw new Error('could not parse page');
+          applyLiveCheck(row, parsed.status, parsed.statusText, parsed.checkedRaw);
+        })
+        .catch(function () {
+          var checkedEl = row.querySelector('.row-checked');
+          if (checkedEl) checkedEl.remove();
+        });
+    });
   </script>
 </body>
 </html>

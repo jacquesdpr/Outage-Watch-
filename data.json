@@ -1,13 +1,13 @@
 {
-  "checked": "2026-08-04 04:08",
   "areas": [
     {
       "id": "brackenfell",
       "name": "Brackenfell",
       "elec": {
         "status": "clear",
-        "statusText": "No outage reported by City",
+        "statusText": "No power outage reported in Brackenfell by the City",
         "note": "",
+        "checked": "2026-08-04 06:15",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
