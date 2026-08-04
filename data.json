@@ -7,13 +7,14 @@
         "status": "clear",
         "statusText": "No power outage reported in Brackenfell by the City",
         "note": "",
-        "checked": "2026-08-04 06:15",
+        "checked": "2026-08-04 06:46",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
         "status": "clear",
-        "statusText": "No active disruption",
+        "statusText": "No water outage reported in Brackenfell",
         "note": "",
+        "checked": "2026-08-04 06:46",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell"
       }
     },
