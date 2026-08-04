@@ -119,12 +119,6 @@
     text-transform:none;
     letter-spacing:0;
   }
-  .checked{
-    font-family:'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    color: var(--muted);
-    white-space:nowrap;
-  }
   .rows{ padding: 4px 16px 12px; }
   .row{
     display:flex; align-items:flex-start; gap:10px;
@@ -175,6 +169,12 @@
   .row-status.clear{ color: var(--text); }
   .row-status.active{ color: #ffb3a0; }
   .row-status.planned{ color: #ffd58a; }
+  .row-checked{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
   .row-note{
     font-size: 12px;
     color: var(--muted);
@@ -261,12 +261,11 @@
 
   <script type="application/json" id="fallback-data">
 {
-  "checked": "2026-08-04 04:08",
   "areas": [
     {
       "id": "brackenfell",
       "name": "Brackenfell",
-      "elec": { "status": "clear", "statusText": "No outage reported by City", "note": "", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
+      "elec": { "status": "clear", "statusText": "No power outage reported in Brackenfell by the City", "note": "", "checked": "2026-08-04 06:15", "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell" },
       "water": { "status": "clear", "statusText": "No active disruption", "note": "", "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell" }
     },
     {
@@ -309,6 +308,7 @@
 
     function rowHtml(tag, entry) {
       var st = statusLabel(entry.status);
+      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + '</div>' : '';
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
       var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
@@ -317,18 +317,19 @@
           '<span class="status-led ' + st + '"></span>' +
           '<div class="row-text">' +
             '<div class="row-status ' + st + '">' + entry.statusText + '</div>' +
+            checked +
             note +
           '</div>' +
         '</div>';
     }
 
-    function cardHtml(area, checkedTime) {
+    function cardHtml(area) {
       var head = area.proxyNote
         ? '<div><h2>' + escapeHtml(area.name) + '</h2><div class="proxy">' + escapeHtml(area.proxyNote) + '</div></div>'
         : '<h2>' + escapeHtml(area.name) + '</h2>';
       return '' +
         '<div class="card">' +
-          '<div class="card-head">' + head + '<span class="checked">checked ' + escapeHtml(checkedTime) + '</span></div>' +
+          '<div class="card-head">' + head + '</div>' +
           '<div class="rows">' + rowHtml('elec', area.elec) + rowHtml('water', area.water) + '</div>' +
           '<div class="card-foot">' +
             '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener">CHECK POWER →</a>' +
@@ -354,9 +355,7 @@
 
     function render(data) {
       document.getElementById('summary-row').innerHTML = summaryHtml(data.areas);
-      document.getElementById('area-list').innerHTML = data.areas.map(function (a) {
-        return cardHtml(a, data.checked);
-      }).join('');
+      document.getElementById('area-list').innerHTML = data.areas.map(cardHtml).join('');
     }
 
     function setLiveIndicator(ok) {
