@@ -44,9 +44,10 @@ USER_AGENT = (
 )
 
 STATUS_PATTERN = re.compile(
-    r"([^.]*?outage[^.]*?)\.?\s*Last checked:\s*(\d{1,2} \w+ \d{4} at \d{1,2}:\d{2})",
+    r"([^.]*?outage[^.]*?)\.?\s*Last checked:\s*(\d{1,2} \w+ \d{4}(?:\s+at\s+|,\s*)\d{1,2}:\d{2})",
     re.I,
 )
+CHECKED_FORMATS = ("%d %b %Y at %H:%M", "%d %b %Y, %H:%M")
 # The page's own <h1> ("Power Outage in Brackenfell, Cape Town") sits directly
 # before the status box with no punctuation between them, so STATUS_PATTERN's
 # lazy match swallows it as a prefix. Strip it back off before storing.
@@ -64,7 +65,14 @@ def fetch_status(page, url, service):
 
     sentence = TITLE_PREFIX.sub("", match.group(1).strip()).strip()
     checked_raw = match.group(2)
-    checked = datetime.strptime(checked_raw, "%d %b %Y at %H:%M").strftime("%Y-%m-%d %H:%M")
+    for fmt in CHECKED_FORMATS:
+        try:
+            checked = datetime.strptime(checked_raw, fmt).strftime("%Y-%m-%d %H:%M")
+            break
+        except ValueError:
+            continue
+    else:
+        raise ValueError(f"unrecognized 'Last checked' date format: {checked_raw!r}")
 
     if re.search(rf"no\s+{service}\s+outage\s+reported", sentence, re.I):
         status = "clear"
