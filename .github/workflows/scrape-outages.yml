@@ -1,11 +1,8 @@
 name: Scrape OurPower outage data
 
-# Schedule disabled until the scraper's status-detection patterns are
-# confirmed accurate against the live site — its first run misclassified
-# every area as "planned outage" from what looks like generic page/nav
-# text rather than actual status. Manual (workflow_dispatch) runs only
-# for now.
 on:
+  schedule:
+    - cron: '*/30 * * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -22,6 +19,8 @@ jobs:
           python-version: '3.x'
 
       - run: pip install -r scripts/requirements.txt
+
+      - run: playwright install --with-deps chromium
 
       - run: python scripts/scrape_ourpower.py
 

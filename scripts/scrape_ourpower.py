@@ -1,70 +1,98 @@
 #!/usr/bin/env python3
 """Scrape OurPower.co.za status pages and refresh data.json.
 
-This was written without ever loading a live OurPower.co.za page (no
-outbound network access in the dev environment), so the status-detection
-patterns below are a best guess at common phrasing rather than something
-verified against the site's actual markup. Expect to need to adjust
-CLEAR_PATTERNS / PLANNED_PATTERNS / ACTIVE_PATTERNS (and the status_text
-extraction) after watching a real run against the live pages.
+A plain HTTP fetch of these pages returns only the page shell — the
+actual status content ("No power outage reported... Last checked: ...")
+is rendered client-side by JavaScript and simply isn't present in the
+raw HTML (confirmed: an earlier requests+BeautifulSoup version couldn't
+find the status pattern on any of 8 pages). This uses a headless
+browser (Playwright/Chromium) to actually load and render each page
+before reading its text.
 
-Safety behavior: if a page can't be fetched or its status can't be
-confidently classified, that area/service is left untouched and a
-warning is printed — a parsing miss should never silently overwrite good
-data with a wrong guess.
+Status detection is anchored on the confirmed real page pattern (verified
+via screenshots of live pages): each status box reads roughly
+
+    <headline mentioning "outage"> ... Last checked: DD Mon YYYY at HH:MM
+
+e.g. "No power outage reported in Brackenfell by the City ... Last
+checked: 04 Aug 2026 at 06:46" for a clear power page, or "No water
+outage reported in Brackenfell ... Last checked: ..." for water (no "by
+the City" suffix on water pages). An active example looked like "Water
+outage in Macassar - reported 19 hours ago Burst Water Main - C/O Kramat
+Road & N2 ... Last checked: ...". No "planned" example has been seen
+live yet, so that classification is still a guess.
+
+Safety behavior: if a page can't be loaded or the pattern can't be
+found, that area/service is left untouched and a warning is printed — a
+parsing miss should never silently overwrite good data with a guess.
 """
 import json
 import re
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from pathlib import Path
 
-import requests
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = REPO_ROOT / "data.json"
 INDEX_PATH = REPO_ROOT / "index.html"
-SAST = timezone(timedelta(hours=2))
 
-REQUEST_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; OutageWatchBot/1.0)"}
-
-CLEAR_PATTERNS = re.compile(
-    r"no (?:reported|active|current)\s+(?:power\s+)?outages?|no outages? reported|all clear",
-    re.I,
-)
-PLANNED_PATTERNS = re.compile(r"planned\s+(?:maintenance|outage|power outage)", re.I)
-ACTIVE_PATTERNS = re.compile(
-    r"\b(?:active|current|ongoing)\s+(?:power\s+)?outage|fault reported|burst\s+(?:pipe|main)",
-    re.I,
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
+DATETIME_PATTERN = r"\d{1,2} \w+ \d{4}(?:\s+at\s+|,\s*)\d{1,2}:\d{2}"
+CHECKED_FORMATS = ("%d %b %Y at %H:%M", "%d %b %Y, %H:%M")
 
-def classify(text):
-    if PLANNED_PATTERNS.search(text):
-        return "planned"
-    if ACTIVE_PATTERNS.search(text):
-        return "active"
-    if CLEAR_PATTERNS.search(text):
-        return "clear"
-    return None
+# Anchored on the two confirmed real headline phrasings rather than any text
+# containing "outage" — the breadcrumb nav ("Home > Power Outages > Cape
+# Town > ...") and the page's own <h1> ("Power Outage in Brackenfell, Cape
+# Town") both also contain "outage" and sit before the real status text with
+# no punctuation to stop a generic lazy match, which was swallowing them in
+# as prefix noise. No "planned" example has been seen live yet, so a page
+# using different wording will correctly fail to match rather than guess.
+CLEAR_PHRASE = r"No\s+(?:Power|Water)\s+outage\s+reported\s+in\s+[^.,]*?"
+# [^.,] (not just [^.]) stops the lazy match at a comma — the page's <h1>
+# ("Water Outage in Macassar, Cape Town") also matches the start of this
+# pattern and has no other punctuation before the real phrase, so without
+# the comma boundary it swallows the whole h1 as a prefix too.
+ACTIVE_PHRASE = r"(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*reported\s+[^.]*?"
+STATUS_PATTERN = re.compile(
+    rf"({CLEAR_PHRASE}|{ACTIVE_PHRASE})\.?\s*Last checked:\s*({DATETIME_PATTERN})",
+    re.I,
+)
 
 
-def fetch_status(url):
-    resp = requests.get(url, timeout=20, headers=REQUEST_HEADERS)
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
-    text = soup.get_text(" ", strip=True)
+def fetch_status(page, url, service):
+    page.goto(url, wait_until="networkidle", timeout=30000)
+    text = re.sub(r"\s+", " ", page.inner_text("body")).strip()
 
-    status = classify(text)
-    if status is None:
-        raise ValueError("could not classify status from page text")
+    match = STATUS_PATTERN.search(text)
+    if not match:
+        snippet = text[:300] if text else "(empty body text)"
+        raise ValueError(f"could not find a status/Last-checked pattern; page text starts: {snippet!r}")
 
-    main = soup.find("main") or soup.find(attrs={"class": re.compile("content|main", re.I)}) or soup
-    heading = main.find(["h1", "h2", "h3"])
-    status_text = heading.get_text(strip=True) if heading else text[:120]
+    sentence = match.group(1).strip()
+    checked_raw = match.group(2)
+    for fmt in CHECKED_FORMATS:
+        try:
+            checked = datetime.strptime(checked_raw, fmt).strftime("%Y-%m-%d %H:%M")
+            break
+        except ValueError:
+            continue
+    else:
+        raise ValueError(f"unrecognized 'Last checked' date format: {checked_raw!r}")
 
-    return status, status_text
+    if re.search(rf"no\s+{service}\s+outage\s+reported", sentence, re.I):
+        status = "clear"
+    elif re.search(r"planned", sentence, re.I):
+        status = "planned"
+    else:
+        status = "active"
+
+    return status, sentence, checked
 
 
 def update_fallback(data):
@@ -81,26 +109,37 @@ def main():
     data = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     changed = False
 
-    for area in data["areas"]:
-        for service in ("elec", "water"):
-            entry = area.get(service)
-            if not entry or not entry.get("link"):
-                continue
-            try:
-                status, status_text = fetch_status(entry["link"])
-            except Exception as exc:
-                print(f"warn: {area['id']}/{service}: {exc}", file=sys.stderr)
-                continue
-            if entry.get("status") != status or entry.get("statusText") != status_text:
-                entry["status"] = status
-                entry["statusText"] = status_text
-                changed = True
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(user_agent=USER_AGENT)
+
+        for area in data["areas"]:
+            for tag in ("elec", "water"):
+                entry = area.get(tag)
+                if not entry or not entry.get("link"):
+                    continue
+                service = "power" if tag == "elec" else "water"
+                try:
+                    status, status_text, checked = fetch_status(page, entry["link"], service)
+                except Exception as exc:
+                    print(f"warn: {area['id']}/{tag}: {exc}", file=sys.stderr)
+                    continue
+                if (
+                    entry.get("status") != status
+                    or entry.get("statusText") != status_text
+                    or entry.get("checked") != checked
+                ):
+                    entry["status"] = status
+                    entry["statusText"] = status_text
+                    entry["checked"] = checked
+                    changed = True
+
+        browser.close()
 
     if not changed:
         print("no changes detected")
         return
 
-    data["checked"] = datetime.now(SAST).strftime("%Y-%m-%d %H:%M")
     DATA_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     update_fallback(data)
     print("data.json updated")
