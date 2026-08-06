@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Scrape OurPower.co.za status pages and refresh data.json.
 
+A plain HTTP fetch of these pages returns only the page shell — the
+actual status content ("No power outage reported... Last checked: ...")
+is rendered client-side by JavaScript and simply isn't present in the
+raw HTML (confirmed: an earlier requests+BeautifulSoup version couldn't
+find the status pattern on any of 8 pages). This uses a headless
+browser (Playwright/Chromium) to actually load and render each page
+before reading its text.
+
 Status detection is anchored on the confirmed real page pattern (verified
 via screenshots of live pages): each status box reads roughly
 
@@ -14,7 +22,7 @@ outage in Macassar - reported 19 hours ago Burst Water Main - C/O Kramat
 Road & N2 ... Last checked: ...". No "planned" example has been seen
 live yet, so that classification is still a guess.
 
-Safety behavior: if a page can't be fetched or the pattern can't be
+Safety behavior: if a page can't be loaded or the pattern can't be
 found, that area/service is left untouched and a warning is printed — a
 parsing miss should never silently overwrite good data with a guess.
 """
@@ -24,32 +32,33 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import requests
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = REPO_ROOT / "data.json"
 INDEX_PATH = REPO_ROOT / "index.html"
 
-REQUEST_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; OutageWatchBot/1.0)"}
+USER_AGENT = "Mozilla/5.0 (compatible; OutageWatchBot/1.0)"
 
 STATUS_PATTERN = re.compile(
     r"([^.]*?outage[^.]*?)\.?\s*Last checked:\s*(\d{1,2} \w+ \d{4} at \d{1,2}:\d{2})",
     re.I,
 )
+# The page's own <h1> ("Power Outage in Brackenfell, Cape Town") sits directly
+# before the status box with no punctuation between them, so STATUS_PATTERN's
+# lazy match swallows it as a prefix. Strip it back off before storing.
+TITLE_PREFIX = re.compile(r"^(?:Power|Water) Outage in [^,]+(?:,\s*Cape Town)?\s*", re.I)
 
 
-def fetch_status(url, service):
-    resp = requests.get(url, timeout=20, headers=REQUEST_HEADERS)
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
-    text = re.sub(r"\s+", " ", soup.get_text(" ", strip=True)).strip()
+def fetch_status(page, url, service):
+    page.goto(url, wait_until="networkidle", timeout=30000)
+    text = re.sub(r"\s+", " ", page.inner_text("body")).strip()
 
     match = STATUS_PATTERN.search(text)
     if not match:
-        raise ValueError("could not find a status/Last-checked pattern on the page")
+        raise ValueError("could not find a status/Last-checked pattern on the rendered page")
 
-    sentence = match.group(1).strip()
+    sentence = TITLE_PREFIX.sub("", match.group(1).strip()).strip()
     checked_raw = match.group(2)
     checked = datetime.strptime(checked_raw, "%d %b %Y at %H:%M").strftime("%Y-%m-%d %H:%M")
 
@@ -77,26 +86,32 @@ def main():
     data = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     changed = False
 
-    for area in data["areas"]:
-        for tag in ("elec", "water"):
-            entry = area.get(tag)
-            if not entry or not entry.get("link"):
-                continue
-            service = "power" if tag == "elec" else "water"
-            try:
-                status, status_text, checked = fetch_status(entry["link"], service)
-            except Exception as exc:
-                print(f"warn: {area['id']}/{tag}: {exc}", file=sys.stderr)
-                continue
-            if (
-                entry.get("status") != status
-                or entry.get("statusText") != status_text
-                or entry.get("checked") != checked
-            ):
-                entry["status"] = status
-                entry["statusText"] = status_text
-                entry["checked"] = checked
-                changed = True
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(user_agent=USER_AGENT)
+
+        for area in data["areas"]:
+            for tag in ("elec", "water"):
+                entry = area.get(tag)
+                if not entry or not entry.get("link"):
+                    continue
+                service = "power" if tag == "elec" else "water"
+                try:
+                    status, status_text, checked = fetch_status(page, entry["link"], service)
+                except Exception as exc:
+                    print(f"warn: {area['id']}/{tag}: {exc}", file=sys.stderr)
+                    continue
+                if (
+                    entry.get("status") != status
+                    or entry.get("statusText") != status_text
+                    or entry.get("checked") != checked
+                ):
+                    entry["status"] = status
+                    entry["statusText"] = status_text
+                    entry["checked"] = checked
+                    changed = True
+
+        browser.close()
 
     if not changed:
         print("no changes detected")
