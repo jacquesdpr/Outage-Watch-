@@ -38,7 +38,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = REPO_ROOT / "data.json"
 INDEX_PATH = REPO_ROOT / "index.html"
 
-USER_AGENT = "Mozilla/5.0 (compatible; OutageWatchBot/1.0)"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
 
 STATUS_PATTERN = re.compile(
     r"([^.]*?outage[^.]*?)\.?\s*Last checked:\s*(\d{1,2} \w+ \d{4} at \d{1,2}:\d{2})",
@@ -56,7 +59,8 @@ def fetch_status(page, url, service):
 
     match = STATUS_PATTERN.search(text)
     if not match:
-        raise ValueError("could not find a status/Last-checked pattern on the rendered page")
+        snippet = text[:300] if text else "(empty body text)"
+        raise ValueError(f"could not find a status/Last-checked pattern; page text starts: {snippet!r}")
 
     sentence = TITLE_PREFIX.sub("", match.group(1).strip()).strip()
     checked_raw = match.group(2)
