@@ -43,15 +43,26 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
+DATETIME_PATTERN = r"\d{1,2} \w+ \d{4}(?:\s+at\s+|,\s*)\d{1,2}:\d{2}"
+CHECKED_FORMATS = ("%d %b %Y at %H:%M", "%d %b %Y, %H:%M")
+
+# Anchored on the two confirmed real headline phrasings rather than any text
+# containing "outage" — the breadcrumb nav ("Home > Power Outages > Cape
+# Town > ...") and the page's own <h1> ("Power Outage in Brackenfell, Cape
+# Town") both also contain "outage" and sit before the real status text with
+# no punctuation to stop a generic lazy match, which was swallowing them in
+# as prefix noise. No "planned" example has been seen live yet, so a page
+# using different wording will correctly fail to match rather than guess.
+CLEAR_PHRASE = r"No\s+(?:Power|Water)\s+outage\s+reported\s+in\s+[^.,]*?"
+# [^.,] (not just [^.]) stops the lazy match at a comma — the page's <h1>
+# ("Water Outage in Macassar, Cape Town") also matches the start of this
+# pattern and has no other punctuation before the real phrase, so without
+# the comma boundary it swallows the whole h1 as a prefix too.
+ACTIVE_PHRASE = r"(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*reported\s+[^.]*?"
 STATUS_PATTERN = re.compile(
-    r"([^.]*?outage[^.]*?)\.?\s*Last checked:\s*(\d{1,2} \w+ \d{4}(?:\s+at\s+|,\s*)\d{1,2}:\d{2})",
+    rf"({CLEAR_PHRASE}|{ACTIVE_PHRASE})\.?\s*Last checked:\s*({DATETIME_PATTERN})",
     re.I,
 )
-CHECKED_FORMATS = ("%d %b %Y at %H:%M", "%d %b %Y, %H:%M")
-# The page's own <h1> ("Power Outage in Brackenfell, Cape Town") sits directly
-# before the status box with no punctuation between them, so STATUS_PATTERN's
-# lazy match swallows it as a prefix. Strip it back off before storing.
-TITLE_PREFIX = re.compile(r"^(?:Power|Water) Outage in [^,]+(?:,\s*Cape Town)?\s*", re.I)
 
 
 def fetch_status(page, url, service):
@@ -63,7 +74,7 @@ def fetch_status(page, url, service):
         snippet = text[:300] if text else "(empty body text)"
         raise ValueError(f"could not find a status/Last-checked pattern; page text starts: {snippet!r}")
 
-    sentence = TITLE_PREFIX.sub("", match.group(1).strip()).strip()
+    sentence = match.group(1).strip()
     checked_raw = match.group(2)
     for fmt in CHECKED_FORMATS:
         try:
