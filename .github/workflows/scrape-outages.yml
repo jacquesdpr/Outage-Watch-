@@ -1,9 +1,8 @@
 name: Scrape OurPower outage data
 
-# Schedule disabled until the scraper (now Playwright-based) has been
-# confirmed accurate against the live site over a few manual
-# (workflow_dispatch) runs.
 on:
+  schedule:
+    - cron: '*/30 * * * *'
   workflow_dispatch: {}
 
 permissions:
