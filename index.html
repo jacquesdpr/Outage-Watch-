@@ -366,7 +366,7 @@
 
     function rowHtml(tag, entry, areaId) {
       var st = statusLabel(entry.status);
-      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + '</div>' : '';
+      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + ' SAST</div>' : '';
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
       var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
@@ -419,7 +419,7 @@
     function setLiveIndicator(ok) {
       var dot = document.getElementById('live-dot');
       var label = document.getElementById('live-label');
-      var time = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      var time = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Johannesburg' });
       if (ok) {
         dot.style.background = 'var(--clear)';
         label.textContent = 'LIVE · fetched ' + time;
@@ -477,7 +477,7 @@
       statusEl.className = 'row-status ' + st;
       statusEl.textContent = statusText;
       var checkedEl = row.querySelector('.row-checked');
-      checkedEl.textContent = 'Last checked: ' + checkedRaw;
+      checkedEl.textContent = 'Last checked: ' + checkedRaw + ' SAST';
     }
 
     function parseOurPowerPage(html, tag) {
