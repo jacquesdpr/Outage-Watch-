@@ -42,8 +42,9 @@
       "name": "Century City",
       "elec": {
         "status": "clear",
+        "provider": "Eskom",
         "statusText": "No power outage reported in Century City by the City",
-        "note": "",
+        "note": "Century City is supplied directly by Eskom, not the City of Cape Town.",
         "checked": "2026-08-08 05:30",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
       },
