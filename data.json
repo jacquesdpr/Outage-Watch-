@@ -43,14 +43,14 @@
       "elec": {
         "status": "clear",
         "statusText": "No power outage reported in Century City by the City",
-        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "note": "",
         "checked": "2026-08-08 05:30",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
       },
       "water": {
         "status": "clear",
         "statusText": "Not yet checked — pending first automated verification",
-        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "note": "",
         "checked": "",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
