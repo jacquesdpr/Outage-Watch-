@@ -38,6 +38,24 @@
       }
     },
     {
+      "id": "century-city",
+      "name": "Century City",
+      "elec": {
+        "status": "clear",
+        "statusText": "Not yet checked — pending first automated verification",
+        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "checked": "",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "Not yet checked — pending first automated verification",
+        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "checked": "",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
+      }
+    },
+    {
       "id": "durbanville",
       "name": "Durbanville",
       "elec": {
