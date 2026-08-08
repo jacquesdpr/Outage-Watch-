@@ -48,10 +48,10 @@
         "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
       },
       "water": {
-        "status": "clear",
-        "statusText": "Not yet checked — pending first automated verification",
+        "status": "planned",
+        "statusText": "Planned water shut-off in Century City on now Water off until tomorrow 08:00 Valve Maintenance - Century City, Tygerhof, Brooklyn, Koeberg, Ysterplaat, Summer Greens, Milnerton Full details ↓",
         "note": "",
-        "checked": "",
+        "checked": "2026-08-08 05:30",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
     },
