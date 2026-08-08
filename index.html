@@ -242,7 +242,7 @@
     <div class="board-header">
       <div class="eyebrow"><span class="dot-live" id="live-dot"></span><span id="live-label">CONNECTING…</span></div>
       <h1>Outage Watch</h1>
-      <p class="sub">Electricity &amp; water status for Brackenfell, Burgundy Estate, Durbanville and Sitari — read from the City of Cape Town's official service-alerts feed.</p>
+      <p class="sub">Electricity &amp; water status for Brackenfell, Burgundy Estate, Century City, Durbanville and Sitari — read from the City of Cape Town's official service-alerts feed.</p>
       <div class="summary-row" id="summary-row"></div>
     </div>
 
@@ -259,11 +259,19 @@
 
   <div class="foot">
     <div class="foot-panel">
+      <h3>City of Cape Town</h3>
+      <p>Live feed from <a href="https://x.com/CityofCT" target="_blank" rel="noopener">@CityofCT</a> on X — the City's main official account.</p>
+      <a class="twitter-timeline" data-theme="dark" data-chrome="noheader nofooter noborders transparent" data-height="400" href="https://twitter.com/CityofCT?ref_src=twsrc%5Etfw">Tweets by @CityofCT</a>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="foot-panel">
       <h3>Report a fault</h3>
       <p>City of Cape Town, 24/7: <span class="call">0860 103 089</span> · online at <a href="https://eservices1.capetown.gov.za/coct/wapl/zsreq_app/index.html" target="_blank" rel="noopener">eservices1.capetown.gov.za</a> · SMS "power" + account number to 31220.</p>
       <h3 style="margin-top:14px;">About this board</h3>
       <p>This board pulls from <a href="https://www.ourpower.co.za" target="_blank" rel="noopener">OurPower.co.za</a>, an independent tracker that reads the City's public alerts feed every ~15 min. It refreshes itself automatically every 30 minutes; tap "Check power / water" on any card to jump to the live page for full detail.</p>
-      <p>Burgundy Estate and Sitari are supplied directly by Eskom rather than the City of Cape Town — marked "Eskom" under the ELEC tag on those cards — so their power status reflects Eskom's own outage reporting, not the City's feed.</p>
+      <p>Burgundy Estate, Century City and Sitari are supplied directly by Eskom rather than the City of Cape Town — marked "Eskom" under the ELEC tag on those cards — so their power status reflects Eskom's own outage reporting, not the City's feed.</p>
     </div>
   </div>
 
@@ -305,6 +313,25 @@
         "note": "",
         "checked": "2026-08-08 05:30",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate"
+      }
+    },
+    {
+      "id": "century-city",
+      "name": "Century City",
+      "elec": {
+        "status": "clear",
+        "provider": "Eskom",
+        "statusText": "No power outage reported in Century City by the City",
+        "note": "Century City is supplied directly by Eskom, not the City of Cape Town.",
+        "checked": "2026-08-08 05:30",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
+      },
+      "water": {
+        "status": "planned",
+        "statusText": "Planned water shut-off in Century City on now Water off until tomorrow 08:00 Valve Maintenance - Century City, Tygerhof, Brooklyn, Koeberg, Ysterplaat, Summer Greens, Milnerton Full details ↓",
+        "note": "",
+        "checked": "2026-08-08 05:30",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
     },
     {
@@ -366,7 +393,7 @@
 
     function rowHtml(tag, entry, areaId) {
       var st = statusLabel(entry.status);
-      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + '</div>' : '';
+      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + ' SAST</div>' : '';
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
       var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
@@ -419,7 +446,7 @@
     function setLiveIndicator(ok) {
       var dot = document.getElementById('live-dot');
       var label = document.getElementById('live-label');
-      var time = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      var time = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Johannesburg' });
       if (ok) {
         dot.style.background = 'var(--clear)';
         label.textContent = 'LIVE · fetched ' + time;
@@ -477,7 +504,7 @@
       statusEl.className = 'row-status ' + st;
       statusEl.textContent = statusText;
       var checkedEl = row.querySelector('.row-checked');
-      checkedEl.textContent = 'Last checked: ' + checkedRaw;
+      checkedEl.textContent = 'Last checked: ' + checkedRaw + ' SAST';
     }
 
     function parseOurPowerPage(html, tag) {

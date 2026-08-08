@@ -38,6 +38,25 @@
       }
     },
     {
+      "id": "century-city",
+      "name": "Century City",
+      "elec": {
+        "status": "clear",
+        "provider": "Eskom",
+        "statusText": "No power outage reported in Century City by the City",
+        "note": "Century City is supplied directly by Eskom, not the City of Cape Town.",
+        "checked": "2026-08-08 05:30",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
+      },
+      "water": {
+        "status": "planned",
+        "statusText": "Planned water shut-off in Century City on now Water off until tomorrow 08:00 Valve Maintenance - Century City, Tygerhof, Brooklyn, Koeberg, Ysterplaat, Summer Greens, Milnerton Full details ↓",
+        "note": "",
+        "checked": "2026-08-08 05:30",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
+      }
+    },
+    {
       "id": "durbanville",
       "name": "Durbanville",
       "elec": {
