@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "payprop": {
+      "type": "http",
+      "url": "https://payprop-mcp-server.onrender.com/mcp",
+      "headers": {
+        "Authorization": "Bearer 732ecba121b477949cdae5e54953ab956be22b3732c0162755c2349fcc5788b1"
+      }
+    }
+  }
+}
