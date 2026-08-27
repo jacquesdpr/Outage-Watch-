@@ -4,17 +4,17 @@
       "id": "brackenfell",
       "name": "Brackenfell",
       "elec": {
-        "status": "clear",
-        "statusText": "No power outage reported in Brackenfell by the City",
+        "status": "active",
+        "statusText": "Possible power outage in Brackenfell - residents reporting 4 residents have reported an outage in the last 2 hours. The City of Cape Town has not logged it yet",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Brackenfell",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell"
       }
     },
@@ -26,14 +26,14 @@
         "provider": "Eskom",
         "statusText": "No power outage reported in Burgundy Estate by the City",
         "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town.",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Burgundy Estate",
         "note": "",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate"
       }
     },
@@ -45,14 +45,14 @@
         "provider": "Eskom",
         "statusText": "No power outage reported in Century City by the City",
         "note": "Century City is supplied directly by Eskom, not the City of Cape Town.",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
       },
       "water": {
-        "status": "clear",
-        "statusText": "No water outage reported in Century City",
+        "status": "planned",
+        "statusText": "Planned water shut-off scheduled for Century City tomorrow 08:00 - Sat, 29 Aug 17:00 Water Main - Century City, Tygerhof, Brooklyn, Koeberg, Ysterplaat, Summer Greens, Milnerton, Kensington, Factreton, Maitland, Goodwood, Edgemead. Monte Vista, Athlone, Langa, WP Showgrounds, Pinelands, Thornton, Parow, Ruyterwacht, Grand West, Epping 1 & 2 and possibly areas in between. Full details ↓",
         "note": "",
-        "checked": "2026-08-23 11:16",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
     },
@@ -63,15 +63,33 @@
         "status": "clear",
         "statusText": "No power outage reported in Durbanville by the City",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Durbanville",
         "note": "",
-        "checked": "2026-08-27 09:15",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville"
+      }
+    },
+    {
+      "id": "helderberg",
+      "name": "Helderberg",
+      "elec": {
+        "status": "clear",
+        "statusText": "No power outage reported in Helderberg by the City",
+        "note": "",
+        "checked": "2026-08-27 15:00",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/helderberg"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No water outage reported in Helderberg",
+        "note": "",
+        "checked": "2026-08-27 15:00",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/helderberg"
       }
     },
     {
@@ -83,15 +101,33 @@
         "provider": "Eskom",
         "statusText": "No power outage reported in Macassar by the City",
         "note": "Sitari is supplied directly by Eskom, not the City of Cape Town.",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Macassar",
         "note": "",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar"
+      }
+    },
+    {
+      "id": "stellenbosch",
+      "name": "Stellenbosch",
+      "elec": {
+        "status": "clear",
+        "statusText": "Power appears to be on in Stellenbosch",
+        "note": "Sourced from esp.info (EskomSePush) rather than OurPower.co.za — OurPower's live outage tracker only covers Cape Town metro, and Stellenbosch is a separate municipality it doesn't track at all.",
+        "checked": "2026-08-07",
+        "link": "https://esp.info/area/stellenbosch-g4aTZsuRNeM"
+      },
+      "water": {
+        "status": "untracked",
+        "statusText": "No live outage source available for Stellenbosch water",
+        "note": "Neither OurPower.co.za nor esp.info has a reliable declarative water-outage status for Stellenbosch (a separate municipality from Cape Town) — esp.info only shows raw crowd-report counts with no synthesized status, which isn't reliable enough to classify automatically.",
+        "checked": "",
+        "link": ""
       }
     }
   ]

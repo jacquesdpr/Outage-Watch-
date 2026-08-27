@@ -154,6 +154,7 @@
   .status-led.clear{ background: var(--clear); box-shadow: 0 0 8px rgba(73,214,127,.6); }
   .status-led.active{ background: var(--active); box-shadow: 0 0 8px rgba(240,96,63,.7); animation: pulse 1.6s infinite; }
   .status-led.planned{ background: var(--planned); box-shadow: 0 0 8px rgba(240,169,59,.6); }
+  .status-led.untracked{ background: var(--muted); box-shadow:none; }
 
   @keyframes pulse{
     0%,100%{ opacity:1; }
@@ -169,6 +170,7 @@
   .row-status.clear{ color: var(--text); }
   .row-status.active{ color: #ffb3a0; }
   .row-status.planned{ color: #ffd58a; }
+  .row-status.untracked{ color: var(--muted); }
   .row-checked{
     font-family:'IBM Plex Mono', monospace;
     font-size: 10.5px;
@@ -203,6 +205,7 @@
   .btn:active{ background: rgba(255,255,255,0.08); }
   .btn.elec{ border-color: rgba(240,169,59,0.35); }
   .btn.water{ border-color: rgba(63,182,201,0.35); }
+  .btn.disabled{ opacity:.4; cursor:default; pointer-events:none; }
 
   /* footer */
   .foot{
@@ -242,7 +245,7 @@
     <div class="board-header">
       <div class="eyebrow"><span class="dot-live" id="live-dot"></span><span id="live-label">CONNECTING…</span></div>
       <h1>Outage Watch</h1>
-      <p class="sub">Electricity &amp; water status for Brackenfell, Burgundy Estate, Century City, Durbanville and Sitari — read from the City of Cape Town's official service-alerts feed.</p>
+      <p class="sub">Electricity &amp; water status for Brackenfell, Burgundy Estate, Century City, Durbanville, Helderberg, Sitari and Stellenbosch — read from the City of Cape Town's official service-alerts feed.</p>
       <div class="summary-row" id="summary-row"></div>
     </div>
 
@@ -282,17 +285,17 @@
       "id": "brackenfell",
       "name": "Brackenfell",
       "elec": {
-        "status": "clear",
-        "statusText": "No power outage reported in Brackenfell by the City",
+        "status": "active",
+        "statusText": "Possible power outage in Brackenfell - residents reporting 4 residents have reported an outage in the last 2 hours. The City of Cape Town has not logged it yet",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Brackenfell",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/brackenfell"
       }
     },
@@ -304,14 +307,14 @@
         "provider": "Eskom",
         "statusText": "No power outage reported in Burgundy Estate by the City",
         "note": "Burgundy Estate is supplied directly by Eskom, not the City of Cape Town.",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/burgundy-estate"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Burgundy Estate",
         "note": "",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/burgundy-estate"
       }
     },
@@ -323,14 +326,14 @@
         "provider": "Eskom",
         "statusText": "No power outage reported in Century City by the City",
         "note": "Century City is supplied directly by Eskom, not the City of Cape Town.",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
       },
       "water": {
-        "status": "clear",
-        "statusText": "No water outage reported in Century City",
+        "status": "planned",
+        "statusText": "Planned water shut-off scheduled for Century City tomorrow 08:00 - Sat, 29 Aug 17:00 Water Main - Century City, Tygerhof, Brooklyn, Koeberg, Ysterplaat, Summer Greens, Milnerton, Kensington, Factreton, Maitland, Goodwood, Edgemead. Monte Vista, Athlone, Langa, WP Showgrounds, Pinelands, Thornton, Parow, Ruyterwacht, Grand West, Epping 1 & 2 and possibly areas in between. Full details ↓",
         "note": "",
-        "checked": "2026-08-23 11:16",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
     },
@@ -341,15 +344,33 @@
         "status": "clear",
         "statusText": "No power outage reported in Durbanville by the City",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Durbanville",
         "note": "",
-        "checked": "2026-08-27 09:15",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville"
+      }
+    },
+    {
+      "id": "helderberg",
+      "name": "Helderberg",
+      "elec": {
+        "status": "clear",
+        "statusText": "No power outage reported in Helderberg by the City",
+        "note": "",
+        "checked": "2026-08-27 15:00",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/helderberg"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "No water outage reported in Helderberg",
+        "note": "",
+        "checked": "2026-08-27 15:00",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/helderberg"
       }
     },
     {
@@ -361,15 +382,33 @@
         "provider": "Eskom",
         "statusText": "No power outage reported in Macassar by the City",
         "note": "Sitari is supplied directly by Eskom, not the City of Cape Town.",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/macassar"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Macassar",
         "note": "",
-        "checked": "2026-08-27 10:01",
+        "checked": "2026-08-27 15:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar"
+      }
+    },
+    {
+      "id": "stellenbosch",
+      "name": "Stellenbosch",
+      "elec": {
+        "status": "clear",
+        "statusText": "Power appears to be on in Stellenbosch",
+        "note": "Sourced from esp.info (EskomSePush) rather than OurPower.co.za — OurPower's live outage tracker only covers Cape Town metro, and Stellenbosch is a separate municipality it doesn't track at all.",
+        "checked": "2026-08-07",
+        "link": "https://esp.info/area/stellenbosch-g4aTZsuRNeM"
+      },
+      "water": {
+        "status": "untracked",
+        "statusText": "No live outage source available for Stellenbosch water",
+        "note": "Neither OurPower.co.za nor esp.info has a reliable declarative water-outage status for Stellenbosch (a separate municipality from Cape Town) — esp.info only shows raw crowd-report counts with no synthesized status, which isn't reliable enough to classify automatically.",
+        "checked": "",
+        "link": ""
       }
     }
   ]
@@ -382,6 +421,7 @@
     function statusLabel(status) {
       if (status === 'active') return 'active';
       if (status === 'planned') return 'planned';
+      if (status === 'untracked') return 'untracked';
       return 'clear';
     }
 
@@ -393,7 +433,7 @@
 
     function rowHtml(tag, entry, areaId) {
       var st = statusLabel(entry.status);
-      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + ' SAST</div>' : '';
+      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + (entry.checked.indexOf(':') !== -1 ? ' SAST' : '') + '</div>' : '';
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
       var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
@@ -408,6 +448,14 @@
         '</div>';
     }
 
+    function checkButtonHtml(tag, entry, areaId) {
+      var label = tag === 'elec' ? 'CHECK POWER' : 'CHECK WATER';
+      if (!entry.link) {
+        return '<span class="btn ' + tag + ' disabled">NOT TRACKED</span>';
+      }
+      return '<a class="btn ' + tag + '" href="' + entry.link + '" target="_blank" rel="noopener" data-area-id="' + areaId + '" data-service="' + tag + '">' + label + ' →</a>';
+    }
+
     function cardHtml(area) {
       var head = area.proxyNote
         ? '<div><h2>' + escapeHtml(area.name) + '</h2><div class="proxy">' + escapeHtml(area.proxyNote) + '</div></div>'
@@ -417,8 +465,8 @@
           '<div class="card-head">' + head + '</div>' +
           '<div class="rows">' + rowHtml('elec', area.elec, area.id) + rowHtml('water', area.water, area.id) + '</div>' +
           '<div class="card-foot">' +
-            '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener" data-area-id="' + area.id + '" data-service="elec">CHECK POWER →</a>' +
-            '<a class="btn water" href="' + area.water.link + '" target="_blank" rel="noopener" data-area-id="' + area.id + '" data-service="water">CHECK WATER →</a>' +
+            checkButtonHtml('elec', area.elec, area.id) +
+            checkButtonHtml('water', area.water, area.id) +
           '</div>' +
         '</div>';
     }
