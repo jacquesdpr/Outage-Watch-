@@ -75,6 +75,24 @@
       }
     },
     {
+      "id": "helderberg",
+      "name": "Helderberg",
+      "elec": {
+        "status": "clear",
+        "statusText": "Not yet checked — pending first automated verification",
+        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "checked": "",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/helderberg"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "Not yet checked — pending first automated verification",
+        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "checked": "",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/helderberg"
+      }
+    },
+    {
       "id": "sitari",
       "name": "Sitari",
       "proxyNote": "not individually tracked — nearest monitored point: Macassar",
