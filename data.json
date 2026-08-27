@@ -118,16 +118,16 @@
       "elec": {
         "status": "clear",
         "statusText": "Not yet checked — pending first automated verification",
-        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "note": "Sourced from esp.info (EskomSePush) rather than OurPower.co.za — OurPower's live outage tracker only covers Cape Town metro, and Stellenbosch is a separate municipality it doesn't track at all.",
         "checked": "",
         "link": "https://esp.info/area/stellenbosch-g4aTZsuRNeM"
       },
       "water": {
-        "status": "clear",
-        "statusText": "Not yet checked — pending first automated verification",
-        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "status": "untracked",
+        "statusText": "No live outage source available for Stellenbosch water",
+        "note": "Neither OurPower.co.za nor esp.info has a reliable declarative water-outage status for Stellenbosch (a separate municipality from Cape Town) — esp.info only shows raw crowd-report counts with no synthesized status, which isn't reliable enough to classify automatically.",
         "checked": "",
-        "link": "https://esp.info/area/stellenbosch-g4aTZsuRNeM"
+        "link": ""
       }
     }
   ]

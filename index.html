@@ -154,6 +154,7 @@
   .status-led.clear{ background: var(--clear); box-shadow: 0 0 8px rgba(73,214,127,.6); }
   .status-led.active{ background: var(--active); box-shadow: 0 0 8px rgba(240,96,63,.7); animation: pulse 1.6s infinite; }
   .status-led.planned{ background: var(--planned); box-shadow: 0 0 8px rgba(240,169,59,.6); }
+  .status-led.untracked{ background: var(--muted); box-shadow:none; }
 
   @keyframes pulse{
     0%,100%{ opacity:1; }
@@ -169,6 +170,7 @@
   .row-status.clear{ color: var(--text); }
   .row-status.active{ color: #ffb3a0; }
   .row-status.planned{ color: #ffd58a; }
+  .row-status.untracked{ color: var(--muted); }
   .row-checked{
     font-family:'IBM Plex Mono', monospace;
     font-size: 10.5px;
@@ -203,6 +205,7 @@
   .btn:active{ background: rgba(255,255,255,0.08); }
   .btn.elec{ border-color: rgba(240,169,59,0.35); }
   .btn.water{ border-color: rgba(63,182,201,0.35); }
+  .btn.disabled{ opacity:.4; cursor:default; pointer-events:none; }
 
   /* footer */
   .foot{
@@ -396,16 +399,16 @@
       "elec": {
         "status": "clear",
         "statusText": "Not yet checked — pending first automated verification",
-        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "note": "Sourced from esp.info (EskomSePush) rather than OurPower.co.za — OurPower's live outage tracker only covers Cape Town metro, and Stellenbosch is a separate municipality it doesn't track at all.",
         "checked": "",
         "link": "https://esp.info/area/stellenbosch-g4aTZsuRNeM"
       },
       "water": {
-        "status": "clear",
-        "statusText": "Not yet checked — pending first automated verification",
-        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "status": "untracked",
+        "statusText": "No live outage source available for Stellenbosch water",
+        "note": "Neither OurPower.co.za nor esp.info has a reliable declarative water-outage status for Stellenbosch (a separate municipality from Cape Town) — esp.info only shows raw crowd-report counts with no synthesized status, which isn't reliable enough to classify automatically.",
         "checked": "",
-        "link": "https://esp.info/area/stellenbosch-g4aTZsuRNeM"
+        "link": ""
       }
     }
   ]
@@ -418,6 +421,7 @@
     function statusLabel(status) {
       if (status === 'active') return 'active';
       if (status === 'planned') return 'planned';
+      if (status === 'untracked') return 'untracked';
       return 'clear';
     }
 
@@ -429,7 +433,7 @@
 
     function rowHtml(tag, entry, areaId) {
       var st = statusLabel(entry.status);
-      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + ' SAST</div>' : '';
+      var checked = entry.checked ? '<div class="row-checked">Last checked: ' + escapeHtml(entry.checked) + (entry.checked.indexOf(':') !== -1 ? ' SAST' : '') + '</div>' : '';
       var note = entry.note ? '<div class="row-note">' + entry.note + '</div>' : '';
       var provider = entry.provider ? '<span class="tag-provider">' + escapeHtml(entry.provider) + '</span>' : '';
       return '' +
@@ -444,6 +448,14 @@
         '</div>';
     }
 
+    function checkButtonHtml(tag, entry, areaId) {
+      var label = tag === 'elec' ? 'CHECK POWER' : 'CHECK WATER';
+      if (!entry.link) {
+        return '<span class="btn ' + tag + ' disabled">NOT TRACKED</span>';
+      }
+      return '<a class="btn ' + tag + '" href="' + entry.link + '" target="_blank" rel="noopener" data-area-id="' + areaId + '" data-service="' + tag + '">' + label + ' →</a>';
+    }
+
     function cardHtml(area) {
       var head = area.proxyNote
         ? '<div><h2>' + escapeHtml(area.name) + '</h2><div class="proxy">' + escapeHtml(area.proxyNote) + '</div></div>'
@@ -453,8 +465,8 @@
           '<div class="card-head">' + head + '</div>' +
           '<div class="rows">' + rowHtml('elec', area.elec, area.id) + rowHtml('water', area.water, area.id) + '</div>' +
           '<div class="card-foot">' +
-            '<a class="btn elec" href="' + area.elec.link + '" target="_blank" rel="noopener" data-area-id="' + area.id + '" data-service="elec">CHECK POWER →</a>' +
-            '<a class="btn water" href="' + area.water.link + '" target="_blank" rel="noopener" data-area-id="' + area.id + '" data-service="water">CHECK WATER →</a>' +
+            checkButtonHtml('elec', area.elec, area.id) +
+            checkButtonHtml('water', area.water, area.id) +
           '</div>' +
         '</div>';
     }
