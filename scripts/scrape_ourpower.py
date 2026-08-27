@@ -19,9 +19,17 @@ checked: 04 Aug 2026 at 06:46" for a clear power page, or "No water
 outage reported in Brackenfell ... Last checked: ..." for water (no "by
 the City" suffix on water pages). An active example looked like "Water
 outage in Macassar - reported 19 hours ago Burst Water Main - C/O Kramat
-Road & N2 ... Last checked: ...". A planned example looked like "Planned
-water shut-off in Century City on now Water off until tomorrow 08:00
-Valve Maintenance - Century City, Tygerhof, ... Last checked: ...".
+Road & N2 ... Last checked: ...". Planned examples have used two
+different phrasings: "Planned water shut-off in Century City on now
+Water off until tomorrow 08:00 Valve Maintenance - Century City,
+Tygerhof, ... Last checked: ..." and "Planned water shut-off scheduled
+for Century City tomorrow 08:00 - Sat, 29 Aug 17:00 Water Main -
+Century City, Tygerhof, ... Last checked: ...". A resident-reported
+(not yet City-confirmed) example looked like "Possible power outage in
+Brackenfell - residents reporting 4 residents have reported an outage
+in the last 2 hours. The City of Cape Town has not logged it yet. Last
+checked: ..." — classified as active since the underlying outage is
+real even though the City hasn't logged it yet.
 
 Safety behavior: if a page can't be loaded or the pattern can't be
 found, that area/service is left untouched and a warning is printed — a
@@ -60,13 +68,25 @@ CLEAR_PHRASE = r"No\s+(?:Power|Water)\s+outage\s+reported\s+in\s+[^.,]*?"
 # pattern and has no other punctuation before the real phrase, so without
 # the comma boundary it swallows the whole h1 as a prefix too.
 ACTIVE_PHRASE = r"(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*reported\s+[^.]*?"
-# Confirmed via a live Century City water page: "Planned water shut-off in
-# Century City on now Water off until tomorrow 08:00 Valve Maintenance -
-# Century City, Tygerhof, ... Last checked: ...". The trailing [^.]*? (not
-# [^.,]*?) lets it cross the comma-separated list of affected suburbs.
-PLANNED_PHRASE = r"Planned\s+(?:Water|Power)\s+shut-off\s+in\s+[^.,]*?\s+on\s+[^.]*?"
+# Confirmed via two different live Century City water pages: "Planned water
+# shut-off in Century City on now Water off until tomorrow 08:00 Valve
+# Maintenance - Century City, Tygerhof, ..." and, on a later run, "Planned
+# water shut-off scheduled for Century City tomorrow 08:00 - Sat, 29 Aug
+# 17:00 Water Main - Century City, Tygerhof, ..., Edgemead. Monte Vista, ...".
+# The trailing .*? (unrestricted, not [^.]*?/[^.,]*?) is needed because the
+# second phrasing's affected-suburbs list itself contains a stray period
+# ("Edgemead. Monte Vista") partway through — it relies entirely on the
+# "Last checked:" anchor to stop, not on punctuation.
+PLANNED_PHRASE = r"Planned\s+(?:Water|Power)\s+shut-off\s+(?:in\s+[^.,]*?\s+on\s+|scheduled\s+for\s+[^.,]*?\s+).*?"
+# Confirmed via a live Brackenfell power page: "Possible power outage in
+# Brackenfell - residents reporting 4 residents have reported an outage in
+# the last 2 hours. The City of Cape Town has not logged it yet." — a
+# crowd-reported outage the City hasn't logged yet. Falls through to
+# "active" in the classification below since there's no "no ... outage
+# reported" or "planned" wording in it.
+POSSIBLE_PHRASE = r"Possible\s+(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*residents\s+reporting\s+.*?"
 STATUS_PATTERN = re.compile(
-    rf"({CLEAR_PHRASE}|{ACTIVE_PHRASE}|{PLANNED_PHRASE})\.?\s*Last checked:\s*({DATETIME_PATTERN})",
+    rf"({CLEAR_PHRASE}|{ACTIVE_PHRASE}|{PLANNED_PHRASE}|{POSSIBLE_PHRASE})\.?\s*Last checked:\s*({DATETIME_PATTERN})",
     re.I,
 )
 
@@ -77,7 +97,7 @@ def fetch_status(page, url, service):
 
     match = STATUS_PATTERN.search(text)
     if not match:
-        snippet = text[:900] if text else "(empty body text)"
+        snippet = text[:300] if text else "(empty body text)"
         raise ValueError(f"could not find a status/Last-checked pattern; page text starts: {snippet!r}")
 
     sentence = match.group(1).strip()
