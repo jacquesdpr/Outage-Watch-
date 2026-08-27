@@ -4,10 +4,10 @@
       "id": "brackenfell",
       "name": "Brackenfell",
       "elec": {
-        "status": "clear",
-        "statusText": "No power outage reported in Brackenfell by the City",
+        "status": "active",
+        "statusText": "Possible power outage in Brackenfell - residents reporting 4 residents have reported an outage in the last 2 hours. The City of Cape Town has not logged it yet",
         "note": "",
-        "checked": "2026-08-27 09:00",
+        "checked": "2026-08-27 14:45",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
@@ -49,10 +49,10 @@
         "link": "https://www.ourpower.co.za/power-outages/cape-town/century-city"
       },
       "water": {
-        "status": "clear",
-        "statusText": "No water outage reported in Century City",
+        "status": "planned",
+        "statusText": "Planned water shut-off scheduled for Century City tomorrow 08:00 - Sat, 29 Aug 17:00 Water Main - Century City, Tygerhof, Brooklyn, Koeberg, Ysterplaat, Summer Greens, Milnerton, Kensington, Factreton, Maitland, Goodwood, Edgemead. Monte Vista, Athlone, Langa, WP Showgrounds, Pinelands, Thornton, Parow, Ruyterwacht, Grand West, Epping 1 & 2 and possibly areas in between. Full details ↓",
         "note": "",
-        "checked": "2026-08-23 11:16",
+        "checked": "2026-08-27 14:45",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
     },
