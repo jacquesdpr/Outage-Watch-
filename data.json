@@ -111,6 +111,24 @@
         "checked": "2026-08-27 14:45",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/macassar"
       }
+    },
+    {
+      "id": "stellenbosch",
+      "name": "Stellenbosch",
+      "elec": {
+        "status": "clear",
+        "statusText": "Not yet checked — pending first automated verification",
+        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "checked": "",
+        "link": "https://www.ourpower.co.za/power-outages/cape-town/stellenbosch"
+      },
+      "water": {
+        "status": "clear",
+        "statusText": "Not yet checked — pending first automated verification",
+        "note": "Newly added; will be verified against the live source on the next scheduled scrape.",
+        "checked": "",
+        "link": "https://www.ourpower.co.za/water-outages/cape-town/stellenbosch"
+      }
     }
   ]
 }
