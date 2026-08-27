@@ -97,7 +97,7 @@ def fetch_status(page, url, service):
 
     match = STATUS_PATTERN.search(text)
     if not match:
-        snippet = text[:300] if text else "(empty body text)"
+        snippet = text[:900] if text else "(empty body text)"
         raise ValueError(f"could not find a status/Last-checked pattern; page text starts: {snippet!r}")
 
     sentence = match.group(1).strip()
