@@ -110,7 +110,7 @@ def fetch_esp_status(text, service):
 
     match = ESP_POWER_PATTERN.search(text)
     if not match:
-        snippet = text[:1200] if text else "(empty body text)"
+        snippet = text[1200:3000] if text else "(empty body text)"
         raise ValueError(f"could not find esp.info power status pattern; page text starts: {snippet!r}")
 
     state = match.group(1).lower()
