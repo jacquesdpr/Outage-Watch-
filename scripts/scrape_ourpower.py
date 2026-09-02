@@ -90,47 +90,9 @@ STATUS_PATTERN = re.compile(
     re.I,
 )
 
-# esp.info (EskomSePush) is used only for Stellenbosch, a separate
-# municipality that OurPower.co.za doesn't cover at all (it only tracks
-# Cape Town metro). Confirmed via a live page: "... In the last 24 hours,
-# ESP users in Stellenbosch have posted 0 power off reports and 3 power on
-# reports. Power appears to be on in Stellenbosch Updated 7 Aug 2026 ...".
-# esp.info only has this synthesized sentence for power — water only has
-# raw crowd-report counts with no declarative status, so water is left
-# untracked (no link) rather than guessed from report counts.
-ESP_POWER_PATTERN = re.compile(
-    r"Power\s+appears\s+to\s+be\s+(on|off)\s+in\s+[^.,]*?\s+Updated\s+(\d{1,2}\s+\w+\s+\d{4})",
-    re.I,
-)
-
-
-def fetch_esp_status(text, service):
-    if service != "power":
-        raise ValueError(f"esp.info scraping only supports power, not {service!r}")
-
-    match = ESP_POWER_PATTERN.search(text)
-    if not match:
-        snippet = text[:300] if text else "(empty body text)"
-        raise ValueError(f"could not find esp.info power status pattern; page text starts: {snippet!r}")
-
-    state = match.group(1).lower()
-    checked_raw = match.group(2)
-    try:
-        checked = datetime.strptime(checked_raw, "%d %b %Y").strftime("%Y-%m-%d")
-    except ValueError:
-        raise ValueError(f"unrecognized esp.info 'Updated' date format: {checked_raw!r}")
-
-    status = "clear" if state == "on" else "active"
-    sentence = f"Power appears to be {state} in Stellenbosch"
-    return status, sentence, checked
-
-
 def fetch_status(page, url, service):
     page.goto(url, wait_until="networkidle", timeout=30000)
     text = re.sub(r"\s+", " ", page.inner_text("body")).strip()
-
-    if "esp.info" in url:
-        return fetch_esp_status(text, service)
 
     match = STATUS_PATTERN.search(text)
     if not match:
@@ -139,9 +101,13 @@ def fetch_status(page, url, service):
 
     sentence = match.group(1).strip()
     checked_raw = match.group(2)
+    # The site abbreviates September as "Sept" (4 letters) rather than the
+    # "Sep" Python's %b expects — confirmed live once the site started
+    # showing September dates. Normalize before parsing.
+    checked_raw_normalized = re.sub(r"\bSept\b", "Sep", checked_raw, flags=re.I)
     for fmt in CHECKED_FORMATS:
         try:
-            checked = datetime.strptime(checked_raw, fmt).strftime("%Y-%m-%d %H:%M")
+            checked = datetime.strptime(checked_raw_normalized, fmt).strftime("%Y-%m-%d %H:%M")
             break
         except ValueError:
             continue
