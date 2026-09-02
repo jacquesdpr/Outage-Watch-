@@ -110,7 +110,7 @@ def fetch_esp_status(text, service):
 
     match = ESP_POWER_PATTERN.search(text)
     if not match:
-        snippet = text[:300] if text else "(empty body text)"
+        snippet = text[:1200] if text else "(empty body text)"
         raise ValueError(f"could not find esp.info power status pattern; page text starts: {snippet!r}")
 
     state = match.group(1).lower()
@@ -139,9 +139,13 @@ def fetch_status(page, url, service):
 
     sentence = match.group(1).strip()
     checked_raw = match.group(2)
+    # The site abbreviates September as "Sept" (4 letters) rather than the
+    # "Sep" Python's %b expects — confirmed live once the site started
+    # showing September dates. Normalize before parsing.
+    checked_raw_normalized = re.sub(r"\bSept\b", "Sep", checked_raw, flags=re.I)
     for fmt in CHECKED_FORMATS:
         try:
-            checked = datetime.strptime(checked_raw, fmt).strftime("%Y-%m-%d %H:%M")
+            checked = datetime.strptime(checked_raw_normalized, fmt).strftime("%Y-%m-%d %H:%M")
             break
         except ValueError:
             continue
