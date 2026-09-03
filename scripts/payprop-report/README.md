@@ -69,12 +69,15 @@ values in Python (`compute_metrics()`) and validating them against the
 original template's known-correct numbers sidesteps that, and all 24
 computable metrics were confirmed to match the original file exactly.
 
-## Preserved template quirks
+## Preserved (and deliberately NOT preserved) template quirks
 
-- Metric #5 "Total Tenants in arrears" (`COUNTA(Arrears!B:B)`) counts the
-  header row along with the data, exactly like the original template. This
-  is a known off-by-one in the source template, kept intentionally for
-  fidelity -- the recommendation text below it uses the corrected count.
+- Metric #5 "Total Tenants in arrears" (`COUNTA(Arrears!B:B)`): the original
+  template counted the header row along with the data (a real off-by-one,
+  since it ran COUNTA over a literal full column in a single pasted-CSV
+  sheet). This build sources Arrears from either a CSV or the sync
+  pipeline's `tenant-arrears-report.json` rather than one paste-in-place
+  range, so there's no header artifact to faithfully reproduce -- we count
+  actual tenants, not header+tenants.
 - Metric #14 "Inactive/Archived tenants with Deposits" originally had a
   `-1` in its formula to offset a full-column reference matching its own
   header row; since this build always uses row-bounded ranges (no header in

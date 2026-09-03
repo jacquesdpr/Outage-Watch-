@@ -16,7 +16,7 @@ from __future__ import annotations
 import csv
 import datetime
 
-from build_report import ACTIVE_BENEFICIARIES_HEADERS, ICDN_HEADERS
+from build_report import ACTIVE_BENEFICIARIES_HEADERS, ARREARS_HEADERS, ICDN_HEADERS
 
 
 def _bool_to_yn(v) -> str:
@@ -102,6 +102,29 @@ def normalize_active_beneficiaries(items: list[dict]) -> list[list]:
             row[H.index("NotifySMS")] = _bool_to_yn(b.get("notify_sms"))
             row[H.index("Agent")] = p.get("responsible_agent")
             rows.append(row)
+    return rows
+
+
+def normalize_arrears_report(arrears_items: list[dict]) -> list[list]:
+    """The Payprop sync pipeline's scripts/report-arrears.mjs output (the
+    "arrears" array of data/tenant-arrears-report.json) -> Arrears tab rows.
+
+    This source has no aging buckets (0-30/31-60/etc.) -- it's a snapshot of
+    current total balance per tenant, not an aged breakdown -- so those
+    columns are left blank/0 and only ID/TenantName/Property/Total are
+    populated. `balance` in this source is negative for money owed (see the
+    Payprop repo's README); the template's convention is a positive "Total
+    arrears" figure, so the sign is flipped here.
+    """
+    H = ARREARS_HEADERS
+    rows = []
+    for it in arrears_items:
+        row = [None] * len(H)
+        row[H.index("ID")] = it.get("tenant_payprop_id")
+        row[H.index("TenantName")] = it.get("tenant_name")
+        row[H.index("Property")] = it.get("property_name")
+        row[H.index("Total")] = abs(_flt(it.get("balance"), 0.0))
+        rows.append(row)
     return rows
 
 
