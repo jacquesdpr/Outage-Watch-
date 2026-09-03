@@ -16,7 +16,7 @@ from __future__ import annotations
 import csv
 import datetime
 
-from build_report import ACTIVE_BENEFICIARIES_HEADERS, ARREARS_HEADERS, ICDN_HEADERS
+from build_report import ACTIVE_BENEFICIARIES_HEADERS, ALL_TENANTS_HEADERS, ARREARS_HEADERS, ICDN_HEADERS
 
 
 def _bool_to_yn(v) -> str:
@@ -60,15 +60,70 @@ def normalize_icdn(items: list[dict]) -> list[list]:
     return rows
 
 
+def normalize_landlords_master(records: list[dict]) -> list[list]:
+    """jacquesdpr/payprop's data/landlords.json (sync pipeline master file,
+    already one row per beneficiary-property pair, already reconciled
+    against live PayProp data) -> Active Beneficiaries tab rows.
+
+    Preferred over normalize_active_beneficiaries(): that one guesses at
+    is_owner/is_active_owner from the raw MCP payload (unverified, and the
+    raw payprop_get_beneficiaries tool has no pagination past 500 rows
+    anyway). This source's own beneficiary_type/status fields are correct
+    (confirmed against a real record 2026-09: is_owner was false on a
+    beneficiary_type="Owner", status="Active" record -- is_owner is not the
+    right field at all).
+    """
+    H = ACTIVE_BENEFICIARIES_HEADERS
+    rows = []
+    for r in records:
+        if r.get("beneficiary_type") != "Owner" or r.get("status") != "Active":
+            continue
+        addr = r.get("address") or {}
+        row = [None] * len(H)
+        row[H.index("Name")] = r.get("name")
+        row[H.index("EmailAddress")] = r.get("email")
+        row[H.index("Mobile")] = r.get("mobile")
+        row[H.index("Phone")] = r.get("phone")
+        row[H.index("Address1")] = addr.get("line1")
+        row[H.index("Address2")] = addr.get("line2")
+        row[H.index("Address3")] = addr.get("line3")
+        row[H.index("City")] = addr.get("city")
+        row[H.index("PostalCode")] = addr.get("postal_code")
+        row[H.index("Province")] = addr.get("province")
+        row[H.index("Country")] = addr.get("country")
+        row[H.index("PropertyID")] = r.get("property_payprop_id")
+        row[H.index("PropertyName")] = r.get("property_name")
+        row[H.index("BenType")] = r.get("beneficiary_type")
+        row[H.index("Commission")] = r.get("commission")
+        row[H.index("PropertyAmount")] = _flt(r.get("property_amount"))
+        row[H.index("AgreementID")] = r.get("agreement_id")
+        row[H.index("BenStatus")] = r.get("status")
+        row[H.index("NotifyEmail")] = _bool_to_yn(r.get("notify_email"))
+        row[H.index("NotifySMS")] = _bool_to_yn(r.get("notify_sms"))
+        row[H.index("CustomerRefBeneficiary")] = r.get("customer_ref_beneficiary")
+        row[H.index("CustomerRefProperty")] = r.get("customer_ref_property")
+        row[H.index("Agent")] = r.get("agent")
+        row[H.index("Tags")] = r.get("tags")
+        rows.append(row)
+    return rows
+
+
 def normalize_active_beneficiaries(items: list[dict]) -> list[list]:
     """payprop_get_beneficiaries items -> Active Beneficiaries tab rows.
 
-    ASSUMPTION (unverified against a real report run yet): "active
-    beneficiary" = is_owner true with at least one property assignment;
-    BenStatus is derived from is_active_owner since the API has no direct
-    status string. notify_email/notify_sms come through as booleans and are
-    converted to the template's Y/N convention. Commission/Amount/
-    PropertyAmount aren't in this API response, so those columns are left
+    FALLBACK ONLY -- prefer normalize_landlords_master() against the sync
+    pipeline's data/landlords.json, which has the correct filter fields
+    (beneficiary_type/status) and isn't capped at 500 rows with no way to
+    page further (this raw MCP tool has no start_page param, so it can't
+    reach beneficiaries past its own row limit at all). Kept for when the
+    pipeline clone isn't available. Its is_owner/is_active_owner-based
+    filtering below is CONFIRMED WRONG (2026-09): a real beneficiary with
+    beneficiary_type="Owner", status="Active" had is_owner=false. Left as-is
+    since there's no live equivalent of beneficiary_type/status to fix it
+    with -- this path just isn't reliable for filtering to active owners.
+    notify_email/notify_sms come through as booleans and are converted to
+    the template's Y/N convention. Commission/Amount/PropertyAmount aren't
+    in this API response, so those columns are left
     blank (cosmetic only -- no Summary formula reads them).
     """
     H = ACTIVE_BENEFICIARIES_HEADERS
@@ -182,3 +237,24 @@ def load_csv_rows(path: str, headers: list[str]) -> list[list]:
                 vals += [None] * (len(headers) - len(vals))
             rows.append(vals[:len(headers)])
     return rows
+
+
+def load_all_tenants_csv(path: str) -> list[list]:
+    """All Tenants is the one case where the real PayProp export (confirmed
+    against a live "Tenants All" CSV, 2026-09) has one fewer column than the
+    original CSM template: it has no "Dep/Rent Ratio" column at all. That
+    column turned out to be a formula in the template itself
+    (=IFERROR(DepBalance/Amount,"")), not raw PayProp data -- so it's
+    computed here instead of loaded.
+    """
+    export_headers = [h for h in ALL_TENANTS_HEADERS if h != "Dep/Rent Ratio"]
+    rows = load_csv_rows(path, export_headers)
+    amount_i = export_headers.index("Amount")
+    depbal_i = export_headers.index("DepBalance")
+    out = []
+    for r in rows:
+        amount = _flt(r[amount_i])
+        depbal = _flt(r[depbal_i])
+        ratio = (depbal / amount) if amount else None
+        out.append(r + [ratio])
+    return out

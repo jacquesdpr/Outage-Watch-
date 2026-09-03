@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
 Orchestrates one report run:
-  - ICDN, Active Beneficiaries: live PayProp MCP calls, dumped to JSON by
-    the calling chat turn (only Claude can call MCP tools, this script
-    can't), then normalized here.
+  - ICDN: live PayProp MCP calls, dumped to JSON by the calling chat turn
+    (only Claude can call MCP tools, this script can't), then normalized
+    here.
+  - Active Beneficiaries: prefer the sync pipeline's data/landlords.json
+    (already reconciled, correct beneficiary_type/status fields); falls
+    back to a live payprop_get_beneficiaries JSON dump if the pipeline
+    clone isn't available (less reliable -- see payprop_normalize.py).
   - Arrears: prefer a fresh data/tenant-arrears-report.json from the
     jacquesdpr/payprop sync pipeline's arrears-report GitHub Action; falls
     back to a manually exported Arrears CSV if that's not available.
@@ -17,7 +21,7 @@ Orchestrates one report run:
 Usage:
     python generate_report.py \
         --icdn-json data/icdn.json \
-        --beneficiaries-json data/beneficiaries.json \
+        --landlords-master-json /home/user/payprop/data/landlords.json \
         --all-tenants-csv uploads/all_tenants.csv \
         --arrears-report-json /home/user/payprop/data/tenant-arrears-report.json \
         --output report.xlsx \
@@ -33,20 +37,21 @@ import json
 import sys
 
 from build_report import (
-    build_workbook, ALL_TENANTS_HEADERS, ARREARS_HEADERS,
+    build_workbook, ARREARS_HEADERS,
     EXPIRED_CONTRACTS_HEADERS, BENEFICIARY_BALANCES_HEADERS,
     ALL_PAYMENTS_HEADERS,
 )
 from payprop_normalize import (
-    normalize_icdn, normalize_active_beneficiaries, normalize_arrears_report,
-    load_csv_rows,
+    normalize_icdn, normalize_active_beneficiaries, normalize_landlords_master,
+    normalize_arrears_report, load_csv_rows, load_all_tenants_csv,
 )
 
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--icdn-json", required=True)
-    p.add_argument("--beneficiaries-json", required=True)
+    p.add_argument("--landlords-master-json", help="data/landlords.json from the sync pipeline (preferred)")
+    p.add_argument("--beneficiaries-json", help="fallback raw payprop_get_beneficiaries dump")
     p.add_argument("--all-tenants-csv", required=True)
     p.add_argument("--arrears-report-json", help="data/tenant-arrears-report.json from the sync pipeline")
     p.add_argument("--arrears-csv", help="fallback if --arrears-report-json isn't available")
@@ -62,19 +67,26 @@ def main():
 
     if not args.arrears_report_json and not args.arrears_csv:
         p.error("one of --arrears-report-json or --arrears-csv is required")
+    if not args.landlords_master_json and not args.beneficiaries_json:
+        p.error("one of --landlords-master-json or --beneficiaries-json is required")
 
     report_date = (datetime.date.fromisoformat(args.report_date)
                    if args.report_date else datetime.date.today())
 
     with open(args.icdn_json) as f:
         icdn_items = json.load(f)
-    with open(args.beneficiaries_json) as f:
-        ben_items = json.load(f)
-
     icdn_rows = normalize_icdn(icdn_items)
-    active_ben_rows = normalize_active_beneficiaries(ben_items)
 
-    all_tenants_rows = load_csv_rows(args.all_tenants_csv, ALL_TENANTS_HEADERS)
+    if args.landlords_master_json:
+        with open(args.landlords_master_json) as f:
+            landlords = json.load(f)
+        active_ben_rows = normalize_landlords_master(landlords["records"])
+    else:
+        with open(args.beneficiaries_json) as f:
+            ben_items = json.load(f)
+        active_ben_rows = normalize_active_beneficiaries(ben_items)
+
+    all_tenants_rows = load_all_tenants_csv(args.all_tenants_csv)
 
     if args.arrears_report_json:
         with open(args.arrears_report_json) as f:
