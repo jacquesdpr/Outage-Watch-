@@ -44,7 +44,12 @@ enum AppConfig {
     static let staffTasksListName = "StaffTasks"
     static let legalLibraryDriveName = "Sectional Title Legal Library"
 
-    /// Base URL of the deployed Azure Function relay for the legal assistant
-    /// (see ServerlessBackend/legal-assistant-function).
-    static let assistantEndpoint = URL(string: "https://REPLACE_WITH_YOUR_FUNCTION.azurewebsites.net/api/legalAssistant")!
+    /// Base URL of the deployed Azure Function App backing the legal assistant
+    /// and push notifications (see ServerlessBackend/marite-functions).
+    static let functionsBaseURL = URL(string: "https://REPLACE_WITH_YOUR_FUNCTION.azurewebsites.net/api")!
+
+    static var assistantEndpoint: URL { functionsBaseURL.appendingPathComponent("legalAssistant") }
+    static var registerDeviceEndpoint: URL { functionsBaseURL.appendingPathComponent("registerDevice") }
+    static var unregisterDeviceEndpoint: URL { functionsBaseURL.appendingPathComponent("unregisterDevice") }
+    static var notifyTaggedEndpoint: URL { functionsBaseURL.appendingPathComponent("notifyTagged") }
 }

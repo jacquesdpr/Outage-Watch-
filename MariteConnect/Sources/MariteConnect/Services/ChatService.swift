@@ -5,10 +5,12 @@ import Foundation
 final class ChatService {
     private let graph: GraphClient
     private let taskService: TaskService
+    private let pushNotificationService: PushNotificationService
 
-    init(graph: GraphClient, taskService: TaskService) {
+    init(graph: GraphClient, taskService: TaskService, pushNotificationService: PushNotificationService) {
         self.graph = graph
         self.taskService = taskService
+        self.pushNotificationService = pushNotificationService
     }
 
     /// Channels visible to the signed-in user: Graph only returns private channels
@@ -48,17 +50,29 @@ final class ChatService {
 
     /// Sends a message that tags `assignee` and opens a matching StaffTask so the
     /// tag can't silently get lost — it stays "open" until the assignee confirms it.
+    /// Also asks the backend to push a "you've been tagged" alert; if that call
+    /// fails (e.g. no connectivity right after sending), the task itself still
+    /// exists and will simply be found the next time the assignee opens the app.
     func sendTaskMessage(channelId: String, channelName: String, text: String, assignee: GraphUser, createdBy: GraphUser) async throws {
         let payload = MessageComposer.taskMessage(text: text, mentioning: assignee)
         let sent: ChatMessage = try await graph.post("teams/\(AppConfig.staffTeamId)/channels/\(channelId)/messages", body: payload)
 
-        try await taskService.createTask(
+        let taskItemId = try await taskService.createTask(
             channelId: channelId,
             channelName: channelName,
             messageId: sent.id,
             summary: text,
             assignee: assignee,
             createdBy: createdBy
+        )
+
+        try? await pushNotificationService.notifyTagged(
+            assignedToId: assignee.id,
+            channelId: channelId,
+            channelName: channelName,
+            messageId: sent.id,
+            taskItemId: taskItemId,
+            taskSummary: text
         )
     }
 }

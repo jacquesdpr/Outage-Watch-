@@ -2,12 +2,14 @@ import SwiftUI
 
 @main
 struct MariteConnectApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var authManager = AuthManager()
 
     var body: some Scene {
         WindowGroup {
             RootView(authManager: authManager)
                 .environmentObject(authManager)
+                .environmentObject(DeepLinkRouter.shared)
         }
     }
 }
@@ -18,6 +20,7 @@ struct MariteConnectApp: App {
 struct RootView: View {
     @ObservedObject private var authManager: AuthManager
     @StateObject private var services: AppServices
+    @ObservedObject private var pushManager = PushNotificationManager.shared
 
     init(authManager: AuthManager) {
         _authManager = ObservedObject(wrappedValue: authManager)
@@ -29,7 +32,13 @@ struct RootView: View {
             if authManager.isSignedIn {
                 RootTabView()
                     .environmentObject(services)
-                    .task { await services.loadCurrentUser() }
+                    .task {
+                        await services.loadCurrentUser()
+                        await pushManager.requestAuthorizationAndRegister()
+                    }
+                    .onReceive(pushManager.$deviceToken.compactMap { $0 }) { token in
+                        Task { try? await services.pushNotificationService.registerDevice(token: token) }
+                    }
             } else {
                 LoginView()
             }

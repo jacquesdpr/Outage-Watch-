@@ -14,6 +14,8 @@ Assistant grounded in the STSMA and CSOS rulings.
 - **Legal Assistant** answers sectional title questions and scenarios,
   grounded in documents you upload to a dedicated SharePoint library, via a
   small serverless relay that talks to Claude.
+- **Push notifications**: the moment someone tags you, you get an alert on
+  your phone — tapping it opens the right channel.
 
 Start with **[HANDOFF.md](HANDOFF.md)** to get this open and building in
 Xcode on your Mac, then **[docs/SETUP.md](docs/SETUP.md)** for the one-time
@@ -31,11 +33,12 @@ MariteConnect/
 │   ├── Auth/                    # MSAL sign-in
 │   ├── Graph/                   # Microsoft Graph REST client
 │   ├── Models/                  # Codable wire types
-│   ├── Services/                # Chat / Task / Search / Assistant business logic
+│   ├── Services/                # Chat / Task / Search / Assistant / Push business logic
+│   ├── Push/                    # APNs registration, deep-link routing
 │   ├── Features/                # SwiftUI screens, one folder per tab
 │   └── Common/                  # shared UI components
 ├── ServerlessBackend/
-│   └── legal-assistant-function/  # Azure Function relay for the legal assistant
+│   └── marite-functions/        # Azure Function App: legal assistant relay + push notifications
 ├── HANDOFF.md                   # how to open/build this in Xcode
 └── docs/
     ├── SETUP.md

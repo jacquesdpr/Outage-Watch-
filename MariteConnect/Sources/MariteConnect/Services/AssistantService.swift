@@ -1,6 +1,6 @@
 import Foundation
 
-/// Talks to the serverless legal-assistant relay (ServerlessBackend/legal-assistant-function).
+/// Talks to the serverless legal-assistant relay (ServerlessBackend/marite-functions).
 /// The app never calls Anthropic directly and never sees the API key — it just sends
 /// the question plus short conversation history, authenticated with the user's own
 /// Graph access token so the relay can confirm the caller is Marite staff.

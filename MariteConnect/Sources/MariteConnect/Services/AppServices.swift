@@ -10,15 +10,18 @@ final class AppServices: ObservableObject {
     let taskService: TaskService
     let searchService: SearchService
     let assistantService: AssistantService
+    let pushNotificationService: PushNotificationService
 
     @Published private(set) var currentUser: GraphUser?
 
     init(authManager: AuthManager) {
         let graph = GraphClient(authManager: authManager)
         let taskService = TaskService(graph: graph)
+        let pushNotificationService = PushNotificationService(authManager: authManager)
         self.graph = graph
         self.taskService = taskService
-        self.chatService = ChatService(graph: graph, taskService: taskService)
+        self.pushNotificationService = pushNotificationService
+        self.chatService = ChatService(graph: graph, taskService: taskService, pushNotificationService: pushNotificationService)
         self.searchService = SearchService(graph: graph)
         self.assistantService = AssistantService(authManager: authManager)
     }

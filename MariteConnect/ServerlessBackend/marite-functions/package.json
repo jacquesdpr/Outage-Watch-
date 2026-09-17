@@ -1,8 +1,8 @@
 {
-  "name": "legal-assistant-function",
+  "name": "marite-functions",
   "version": "1.0.0",
   "private": true,
-  "description": "Azure Function relay for the Marite Connect Sectional Title Assistant. Holds the Anthropic API key, searches the Sectional Title Legal Library in SharePoint via Microsoft Graph, and returns a grounded, cited answer.",
+  "description": "Azure Function App for Marite Connect's server-side needs: the Sectional Title Assistant relay to Claude, and APNs push notifications for tagged tasks. Everything else in the app talks to Microsoft Graph directly.",
   "main": "dist/src/functions/*.js",
   "scripts": {
     "build": "tsc",
@@ -12,10 +12,13 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
+    "@azure/data-tables": "^13.2.2",
     "@azure/functions": "^4.5.0",
+    "jsonwebtoken": "^9.0.2",
     "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.0.0",
     "@types/pdf-parse": "^1.1.4",
     "typescript": "^5.5.0"

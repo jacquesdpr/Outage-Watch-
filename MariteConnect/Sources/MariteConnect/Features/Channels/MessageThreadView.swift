@@ -3,67 +3,54 @@ import SwiftUI
 struct MessageThreadView: View {
     let channel: Channel
 
-    @EnvironmentObject private var services: AppServices
-    @StateObject private var box = ViewModelBox()
+    @StateObject private var viewModel: MessageThreadViewModel
 
-    var body: some View {
-        VStack(spacing: 0) {
-            if let model = box.model {
-                if model.isLoading && model.messages.isEmpty {
-                    LoadingView()
-                } else if model.messages.isEmpty {
-                    EmptyStateView(systemImage: "bubble.left", title: "No messages yet", message: "Be the first to post in #\(channel.displayName).")
-                } else {
-                    ScrollViewReader { proxy in
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 12) {
-                                ForEach(model.messages) { message in
-                                    MessageBubble(message: message, needsConfirmation: model.isConfirmable(message: message)) {
-                                        Task { await model.confirmDone(message: message) }
-                                    }
-                                    .id(message.id)
-                                }
-                            }
-                            .padding()
-                        }
-                        .onChange(of: model.messages.count) { _, _ in
-                            if let last = model.messages.last {
-                                withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-                            }
-                        }
-                    }
-                }
-
-                if let error = model.errorMessage {
-                    ErrorBanner(message: error)
-                }
-
-                MessageComposerView(model: model)
-            } else {
-                LoadingView()
-            }
-        }
-        .navigationTitle(channel.displayName)
-        .navigationBarTitleDisplayMode(.inline)
-        .task {
-            box.bind(channel: channel, services: services)
-            await box.model?.load()
-        }
-    }
-}
-
-@MainActor
-private final class ViewModelBox: ObservableObject {
-    @Published var model: MessageThreadViewModel?
-
-    func bind(channel: Channel, services: AppServices) {
-        guard model == nil else { return }
-        model = MessageThreadViewModel(
+    init(channel: Channel, services: AppServices) {
+        self.channel = channel
+        _viewModel = StateObject(wrappedValue: MessageThreadViewModel(
             channel: channel,
             chatService: services.chatService,
             taskService: services.taskService,
             currentUser: services.currentUser
-        )
+        ))
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if viewModel.isLoading && viewModel.messages.isEmpty {
+                LoadingView()
+            } else if viewModel.messages.isEmpty {
+                EmptyStateView(systemImage: "bubble.left", title: "No messages yet", message: "Be the first to post in #\(channel.displayName).")
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 12) {
+                            ForEach(viewModel.messages) { message in
+                                MessageBubble(message: message, needsConfirmation: viewModel.isConfirmable(message: message)) {
+                                    Task { await viewModel.confirmDone(message: message) }
+                                }
+                                .id(message.id)
+                            }
+                        }
+                        .padding()
+                    }
+                    .onChange(of: viewModel.messages.count) { _, _ in
+                        if let last = viewModel.messages.last {
+                            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
+                        }
+                    }
+                }
+            }
+
+            if let error = viewModel.errorMessage {
+                ErrorBanner(message: error)
+            }
+
+            MessageComposerView(model: viewModel)
+        }
+        .navigationTitle(channel.displayName)
+        .navigationBarTitleDisplayMode(.inline)
+        .task { await viewModel.load() }
     }
 }
 

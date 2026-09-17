@@ -47,6 +47,8 @@ targets:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: false
         NSFaceIDUsageDescription: "Marite Connect uses Face ID to quickly and securely unlock the app."
+    entitlements:
+      path: Sources/MariteConnect/Resources/MariteConnect.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.marite.MariteConnect

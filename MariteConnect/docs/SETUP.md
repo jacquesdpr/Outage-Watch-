@@ -1,8 +1,9 @@
 # Setup guide
 
-Follow these in order. Steps 1–4 are one-time Microsoft 365 / Azure admin
-tasks (need Global Admin or Application Administrator + SharePoint admin
-rights on the Marite tenant); step 5 builds the app in Xcode.
+Follow these in order. Steps 1–5 are one-time Microsoft 365 / Azure / Apple
+Developer admin tasks (need Global Admin or Application Administrator +
+SharePoint admin rights on the Marite tenant, plus access to Marite's Apple
+Developer account for step 5); step 6 builds the app in Xcode.
 
 ## 1. Create the "Marite Staff" Team
 
@@ -85,14 +86,37 @@ This Team's channels back the app's chat feature.
      schemes (PDF). Name files descriptively (e.g.
      `CSOS Order - Trustee Dispute - Case 1234.pdf`) since the file name is
      shown as the citation title.
-3. Follow `ServerlessBackend/legal-assistant-function/README.md` to register
-   a second, app-only Entra ID app (`Sites.Read.All` application permission)
-   and deploy the Azure Function, then set `AppConfig.assistantEndpoint` to
-   the deployed Function URL.
+3. Follow `ServerlessBackend/marite-functions/README.md` to register a
+   second, app-only Entra ID app (`Sites.Read.All` application permission)
+   and deploy the Function App, then set `AppConfig.functionsBaseURL` in
+   `AppConfig.swift` to the deployed Function App's URL (e.g.
+   `https://marite-functions.azurewebsites.net/api`).
 4. Keep adding documents over time — no redeploy needed, the assistant
    searches the library live on every question.
 
-## 5. Build the app in Xcode
+## 5. Set up push notifications
+
+The same Function App from step 3 also handles push notifications, so if
+you've already deployed it, most of this is done. The one Marite-specific
+step is creating an APNs auth key:
+
+1. In [developer.apple.com](https://developer.apple.com) → **Certificates,
+   Identifiers & Profiles → Keys**, create a key with the **Apple Push
+   Notifications service (APNs)** capability, and download the `.p8` file
+   (only downloadable once — keep it somewhere safe).
+2. Follow the "Push notifications" section of
+   `ServerlessBackend/marite-functions/README.md` to add that key, your
+   Apple Developer Team ID, and the app's bundle ID to the Function App's
+   configuration.
+3. Confirm `Sources/MariteConnect/Resources/MariteConnect.entitlements` has
+   `aps-environment` set to `development` for local/TestFlight-via-Xcode
+   builds (already the default in this project), and switch it to
+   `production` before an App Store release build.
+
+No further app-side config is needed — the app registers for push
+notifications automatically once signed in.
+
+## 6. Build the app in Xcode
 
 Requires a Mac with Xcode 15+.
 
@@ -110,7 +134,8 @@ In Xcode:
 2. Confirm the values you filled into `AppConfig.swift` and the Function's
    `local.settings.json` earlier.
 3. Build & run on a simulator or device signed in with a Marite Microsoft
-   365 test account.
+   365 test account. Push notifications need a **physical device** — the
+   Simulator can't register for real APNs delivery.
 4. Replace the placeholder app icon: drag `docs/marite-logo.jpg` (the Marite
    logo) into `AppIcon` in `Assets.xcassets` in Xcode, sized to 1024×1024 for
    the App Store slot (Xcode's icon composer / an online icon generator can
@@ -139,3 +164,9 @@ assistant end to end:
    in SharePoint/Office.
 5. Ask the **Legal Assistant** a question that matches a document you
    uploaded, and confirm the citation links to the right file.
+6. On a physical device, tag yourself (or have a second person tag you) and
+   confirm a push notification arrives and tapping it opens the right
+   channel. If it doesn't arrive, check the Function App's logs for the
+   `notifyTagged` call first — a 401 there means the caller's Graph token
+   didn't validate, anything else usually points at the APNs key/bundle ID
+   configuration.

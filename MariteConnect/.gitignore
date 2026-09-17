@@ -10,8 +10,8 @@ DerivedData/
 xcuserdata/
 
 # Azure Functions backend
-ServerlessBackend/legal-assistant-function/node_modules/
-ServerlessBackend/legal-assistant-function/dist/
-ServerlessBackend/legal-assistant-function/local.settings.json
+ServerlessBackend/marite-functions/node_modules/
+ServerlessBackend/marite-functions/dist/
+ServerlessBackend/marite-functions/local.settings.json
 
 .DS_Store

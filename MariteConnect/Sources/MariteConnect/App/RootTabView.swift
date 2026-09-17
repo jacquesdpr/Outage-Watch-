@@ -1,18 +1,20 @@
 import SwiftUI
 
 struct RootTabView: View {
+    @EnvironmentObject private var services: AppServices
+
     var body: some View {
         TabView {
-            ChannelListView()
+            ChannelListView(services: services)
                 .tabItem { Label("Channels", systemImage: "bubble.left.and.bubble.right.fill") }
 
-            MyTasksView()
+            MyTasksView(services: services)
                 .tabItem { Label("My Tasks", systemImage: "checkmark.circle.fill") }
 
-            SharePointSearchView()
+            SharePointSearchView(services: services)
                 .tabItem { Label("Search", systemImage: "magnifyingglass") }
 
-            SectionalTitleAssistantView()
+            SectionalTitleAssistantView(services: services)
                 .tabItem { Label("Legal Assistant", systemImage: "building.columns.fill") }
         }
     }

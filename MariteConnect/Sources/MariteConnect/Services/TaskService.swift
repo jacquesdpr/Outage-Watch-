@@ -47,7 +47,10 @@ final class TaskService {
             }
     }
 
-    func createTask(channelId: String, channelName: String, messageId: String, summary: String, assignee: GraphUser, createdBy: GraphUser) async throws {
+    /// Returns the new list item's ID, so callers (e.g. ChatService, to trigger
+    /// a push notification) can reference this specific task afterwards.
+    @discardableResult
+    func createTask(channelId: String, channelName: String, messageId: String, summary: String, assignee: GraphUser, createdBy: GraphUser) async throws -> String {
         let fields = StaffTaskFields(
             Title: summary,
             ChannelId: channelId,
@@ -59,7 +62,8 @@ final class TaskService {
             CreatedByName: createdBy.displayName,
             Status: StaffTask.Status.open.rawValue
         )
-        let _: ListItem = try await graph.post(listItemsPath, body: NewListItem(fields: fields))
+        let created: ListItem = try await graph.post(listItemsPath, body: NewListItem(fields: fields))
+        return created.id
     }
 
     /// Marks a task done — this is what the "Done" button in a chat bubble or the

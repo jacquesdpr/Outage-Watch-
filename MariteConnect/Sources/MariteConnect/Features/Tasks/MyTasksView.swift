@@ -1,60 +1,46 @@
 import SwiftUI
 
 struct MyTasksView: View {
-    @EnvironmentObject private var services: AppServices
-    @StateObject private var box = ViewModelBox()
+    @StateObject private var viewModel: MyTasksViewModel
+
+    init(services: AppServices) {
+        _viewModel = StateObject(wrappedValue: MyTasksViewModel(taskService: services.taskService, currentUser: services.currentUser))
+    }
 
     var body: some View {
         NavigationStack {
             content
                 .navigationTitle("My Tasks")
-                .task {
-                    box.bind(services: services)
-                    await box.model?.load()
-                }
-                .refreshable { await box.model?.load() }
+                .task { await viewModel.load() }
+                .refreshable { await viewModel.load() }
         }
     }
 
     @ViewBuilder
     private var content: some View {
-        if let model = box.model {
-            if model.isLoading && model.tasks.isEmpty {
-                LoadingView()
-            } else if model.tasks.isEmpty {
-                EmptyStateView(systemImage: "checkmark.circle", title: "All clear", message: "Tasks tagged to you across every channel will show up here until you confirm them done.")
-            } else {
-                List {
-                    if model.openCount > 0 {
-                        Section("Open (\(model.openCount))") {
-                            ForEach(model.tasks.filter { $0.status == .open }) { task in
-                                TaskRow(task: task) { Task { await model.toggle(task) } }
-                            }
-                        }
-                    }
-                    Section("Completed") {
-                        ForEach(model.tasks.filter { $0.status == .done }) { task in
-                            TaskRow(task: task) { Task { await model.toggle(task) } }
+        if viewModel.isLoading && viewModel.tasks.isEmpty {
+            LoadingView()
+        } else if viewModel.tasks.isEmpty {
+            EmptyStateView(systemImage: "checkmark.circle", title: "All clear", message: "Tasks tagged to you across every channel will show up here until you confirm them done.")
+        } else {
+            List {
+                if viewModel.openCount > 0 {
+                    Section("Open (\(viewModel.openCount))") {
+                        ForEach(viewModel.tasks.filter { $0.status == .open }) { task in
+                            TaskRow(task: task) { Task { await viewModel.toggle(task) } }
                         }
                     }
                 }
-                if let error = model.errorMessage {
-                    ErrorBanner(message: error)
+                Section("Completed") {
+                    ForEach(viewModel.tasks.filter { $0.status == .done }) { task in
+                        TaskRow(task: task) { Task { await viewModel.toggle(task) } }
+                    }
                 }
             }
-        } else {
-            LoadingView()
+            if let error = viewModel.errorMessage {
+                ErrorBanner(message: error)
+            }
         }
-    }
-}
-
-@MainActor
-private final class ViewModelBox: ObservableObject {
-    @Published var model: MyTasksViewModel?
-
-    func bind(services: AppServices) {
-        guard model == nil else { return }
-        model = MyTasksViewModel(taskService: services.taskService, currentUser: services.currentUser)
     }
 }
 
