@@ -1,0 +1,20 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+
+    "ANTHROPIC_API_KEY": "sk-ant-...",
+    "ANTHROPIC_MODEL": "claude-sonnet-5",
+
+    "GRAPH_TENANT_ID": "REPLACE_WITH_ENTRA_TENANT_ID",
+    "GRAPH_CLIENT_ID": "REPLACE_WITH_APP_ONLY_APP_CLIENT_ID",
+    "GRAPH_CLIENT_SECRET": "REPLACE_WITH_APP_ONLY_APP_CLIENT_SECRET",
+
+    "LEGAL_LIBRARY_SITE_ID": "REPLACE_WITH_SHAREPOINT_SITE_ID",
+    "LEGAL_LIBRARY_DRIVE_ID": "REPLACE_WITH_LEGAL_LIBRARY_DRIVE_ID"
+  },
+  "Host": {
+    "CORS": "*"
+  }
+}
