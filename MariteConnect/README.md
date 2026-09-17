@@ -15,10 +15,11 @@ Assistant grounded in the STSMA and CSOS rulings.
   grounded in documents you upload to a dedicated SharePoint library, via a
   small serverless relay that talks to Claude.
 
-Start with **[docs/SETUP.md](docs/SETUP.md)** — it walks through the
-one-time Microsoft 365/Entra ID/Azure setup, then building the Xcode
-project. See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for how the
-pieces fit together and why.
+Start with **[HANDOFF.md](HANDOFF.md)** to get this open and building in
+Xcode on your Mac, then **[docs/SETUP.md](docs/SETUP.md)** for the one-time
+Microsoft 365/Entra ID/Azure configuration that makes it actually work
+against Marite's tenant. See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
+for how the pieces fit together and why.
 
 ## Layout
 
@@ -35,6 +36,7 @@ MariteConnect/
 │   └── Common/                  # shared UI components
 ├── ServerlessBackend/
 │   └── legal-assistant-function/  # Azure Function relay for the legal assistant
+├── HANDOFF.md                   # how to open/build this in Xcode
 └── docs/
     ├── SETUP.md
     └── ARCHITECTURE.md
