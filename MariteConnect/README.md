@@ -17,8 +17,15 @@ Assistant grounded in the STSMA and CSOS rulings.
 - **Push notifications**: the moment someone tags you, you get an alert on
   your phone — tapping it opens the right channel.
 
-Start with **[HANDOFF.md](HANDOFF.md)** to get this open and building in
-Xcode on your Mac, then **[docs/SETUP.md](docs/SETUP.md)** for the one-time
+Two ways to get this open in Xcode:
+
+- **No git, just clicking and pasting**: **[PASTE_IN_XCODE.md](PASTE_IN_XCODE.md)**
+  — create a new Xcode project yourself and paste in one file
+  (`MariteConnectAllInOne.swift`) containing the whole app.
+- **The organized, multi-file project** (needs one Terminal command):
+  **[HANDOFF.md](HANDOFF.md)**.
+
+Either way, next read **[docs/SETUP.md](docs/SETUP.md)** for the one-time
 Microsoft 365/Entra ID/Azure configuration that makes it actually work
 against Marite's tenant. See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
 for how the pieces fit together and why.
