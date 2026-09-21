@@ -171,6 +171,20 @@ def normalize_active_beneficiaries(items: list[dict]) -> list[list]:
     return rows
 
 
+def load_active_beneficiaries_csv(path: str) -> list[list]:
+    """A direct PayProp 'Beneficiaries Owners' CSV export -- the real thing,
+    not a reconstruction. Preferred over both normalize_landlords_master()
+    (depends on the sync pipeline, which has had a real archiving bug) and
+    normalize_active_beneficiaries() (guesses at MCP field semantics) --
+    this is unambiguous PayProp data with the template's own BenStatus
+    column, no inference needed. Filters to BenStatus == "Active" to match
+    the tab's own name; the export can include archived owners too.
+    """
+    rows = load_csv_rows(path, ACTIVE_BENEFICIARIES_HEADERS)
+    status_i = ACTIVE_BENEFICIARIES_HEADERS.index("BenStatus")
+    return [r for r in rows if r[status_i] == "Active"]
+
+
 def normalize_arrears_report(arrears_items: list[dict]) -> list[list]:
     """The Payprop sync pipeline's scripts/report-arrears.mjs output (the
     "arrears" array of data/tenant-arrears-report.json) -> Arrears tab rows.

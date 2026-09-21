@@ -44,13 +44,15 @@ from build_report import (
 from payprop_normalize import (
     normalize_icdn, normalize_active_beneficiaries, normalize_landlords_master,
     normalize_arrears_report, load_csv_rows, load_all_tenants_csv,
+    load_active_beneficiaries_csv,
 )
 
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--icdn-json", required=True)
-    p.add_argument("--landlords-master-json", help="data/landlords.json from the sync pipeline (preferred)")
+    p.add_argument("--active-beneficiaries-csv", help="a direct PayProp 'Beneficiaries Owners' CSV export (most preferred -- unambiguous, no pipeline/MCP inference needed)")
+    p.add_argument("--landlords-master-json", help="data/landlords.json from the sync pipeline (used if no CSV given)")
     p.add_argument("--landlords-archive-json", help="data/landlords-archive.json -- used to undo the pipeline's not_seen_in_cycle mis-archiving bug (see payprop_normalize.normalize_landlords_master)")
     p.add_argument("--beneficiaries-json", help="fallback raw payprop_get_beneficiaries dump")
     p.add_argument("--all-tenants-csv", required=True)
@@ -68,8 +70,8 @@ def main():
 
     if not args.arrears_report_json and not args.arrears_csv:
         p.error("one of --arrears-report-json or --arrears-csv is required")
-    if not args.landlords_master_json and not args.beneficiaries_json:
-        p.error("one of --landlords-master-json or --beneficiaries-json is required")
+    if not args.active_beneficiaries_csv and not args.landlords_master_json and not args.beneficiaries_json:
+        p.error("one of --active-beneficiaries-csv, --landlords-master-json or --beneficiaries-json is required")
 
     report_date = (datetime.date.fromisoformat(args.report_date)
                    if args.report_date else datetime.date.today())
@@ -78,7 +80,9 @@ def main():
         icdn_items = json.load(f)
     icdn_rows = normalize_icdn(icdn_items)
 
-    if args.landlords_master_json:
+    if args.active_beneficiaries_csv:
+        active_ben_rows = load_active_beneficiaries_csv(args.active_beneficiaries_csv)
+    elif args.landlords_master_json:
         with open(args.landlords_master_json) as f:
             landlords = json.load(f)
         archive_records = None
@@ -96,6 +100,16 @@ def main():
     if args.arrears_report_json:
         with open(args.arrears_report_json) as f:
             arrears_report = json.load(f)
+        checked = arrears_report.get("properties_checked", 0)
+        errored = len(arrears_report.get("properties_with_errors", []))
+        if checked and errored / checked > 0.2:
+            p.error(
+                f"{args.arrears_report_json}: {errored}/{checked} property lookups failed "
+                f"(generated_at={arrears_report.get('generated_at')}) -- this run is unreliable "
+                f"(likely a PayProp API outage during the run, not a real drop in arrears), refusing "
+                f"to build a report on it. Pass a known-good arrears-report.json (e.g. recovered from "
+                f"git history) or --arrears-csv instead."
+            )
         arrears_rows = normalize_arrears_report(arrears_report["arrears"])
     else:
         arrears_rows = load_csv_rows(args.arrears_csv, ARREARS_HEADERS)
