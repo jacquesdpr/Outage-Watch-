@@ -51,6 +51,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--icdn-json", required=True)
     p.add_argument("--landlords-master-json", help="data/landlords.json from the sync pipeline (preferred)")
+    p.add_argument("--landlords-archive-json", help="data/landlords-archive.json -- used to undo the pipeline's not_seen_in_cycle mis-archiving bug (see payprop_normalize.normalize_landlords_master)")
     p.add_argument("--beneficiaries-json", help="fallback raw payprop_get_beneficiaries dump")
     p.add_argument("--all-tenants-csv", required=True)
     p.add_argument("--arrears-report-json", help="data/tenant-arrears-report.json from the sync pipeline")
@@ -80,7 +81,11 @@ def main():
     if args.landlords_master_json:
         with open(args.landlords_master_json) as f:
             landlords = json.load(f)
-        active_ben_rows = normalize_landlords_master(landlords["records"])
+        archive_records = None
+        if args.landlords_archive_json:
+            with open(args.landlords_archive_json) as f:
+                archive_records = json.load(f)["records"]
+        active_ben_rows = normalize_landlords_master(landlords["records"], archive_records)
     else:
         with open(args.beneficiaries_json) as f:
             ben_items = json.load(f)

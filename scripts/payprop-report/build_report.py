@@ -281,8 +281,10 @@ def build_workbook(
     f_value_na = wb.add_format({"font_name": "Segoe UI", "font_size": 18, "align": "center", "bg_color": "#FFF2CC"})
     f_date = wb.add_format({"font_name": "Calibri", "font_size": 18, "align": "right", "num_format": DATE_FMT})
     f_header = wb.add_format({"font_name": "Calibri", "bold": True, "bg_color": "#D9D9D9", "border": 1})
-    f_rec_ref = wb.add_format({"font_name": "Calibri", "font_size": 14, "align": "center", "valign": "top"})
-    f_rec_text = wb.add_format({"font_name": "Calibri", "font_size": 14, "text_wrap": True, "valign": "top"})
+    f_rec_header = wb.add_format({"font_name": "Calibri", "font_size": 18, "bold": True, "bg_color": "#F2F2F2", "align": "center"})
+    f_rec_header_l = wb.add_format({"font_name": "Calibri", "font_size": 18, "bold": True, "bg_color": "#F2F2F2"})
+    f_rec_ref = wb.add_format({"font_name": "Calibri", "font_size": 18, "align": "center", "valign": "top"})
+    f_rec_text = wb.add_format({"font_name": "Calibri", "font_size": 18, "text_wrap": True, "valign": "top"})
     f_note = wb.add_format({"font_name": "Calibri", "font_size": 11, "italic": True, "bg_color": "#FFF2CC"})
 
     def data_sheet(name, headers, rows):
@@ -324,18 +326,24 @@ def build_workbook(
     ws = wb.add_worksheet("Summary")
     wb.worksheets_objs.insert(0, wb.worksheets_objs.pop())  # move Summary first
 
-    ws.set_column("A:A", 2.7)
+    ws.set_column("A:A", 2.66)
     ws.set_column("B:B", 1.5)
     ws.set_column("C:C", 63.5)
-    ws.set_column("D:D", 21.7)
+    ws.set_column("D:D", 21.66)
     ws.set_column("E:E", 3)
-    ws.set_column("F:F", 61.3)
-    ws.set_column("G:G", 27.8)
-    ws.set_column("K:K", 5.7)
-    ws.set_column("M:M", 60)
+    ws.set_column("F:F", 61.33)
+    ws.set_column("G:G", 27.83)
+    ws.set_column("K:K", 5.66)
+    ws.set_column("M:M", 103.16)
+    ws.set_column("N:N", 4.83)
+
+    # Exact row heights from the original CSM template (rows 1-25).
+    for r, h in {1: 17, 3: 67, 5: 33, 7: 24, 8: 25, 9: 26, 10: 26, 11: 26,
+                 12: 26, 13: 27, 14: 27, 15: 25, 16: 27, 17: 26, 18: 26,
+                 19: 26, 20: 27, 21: 27, 22: 25, 23: 26, 24: 26, 25: 27}.items():
+        ws.set_row(r - 1, h)
 
     ws.write("C3", "        Portfolio Health Check ", f_title)
-    ws.set_row(2, 67)
     ws.write("C5", client_name, f_subtitle)
     ws.write("C6", f"Ref : {client_ref}", f_meta)
     ws.write("F5", "Report Date :", f_meta_r)
@@ -426,8 +434,8 @@ def build_workbook(
     # beneficiary is an admin account") are intentionally left for the
     # reviewer to fill in -- fabricating that context would misrepresent the
     # data as investigated when it hasn't been.
-    ws.write("K4", "Ref", f_header)
-    ws.write("M4", "Recommendations", f_header)
+    ws.write("K4", "Ref", f_rec_header)
+    ws.write("M4", "Recommendations", f_rec_header_l)
 
     recs = []
     if m["tenants_in_arrears"] > 0:

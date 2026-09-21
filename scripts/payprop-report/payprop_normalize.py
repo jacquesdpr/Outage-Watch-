@@ -60,7 +60,7 @@ def normalize_icdn(items: list[dict]) -> list[list]:
     return rows
 
 
-def normalize_landlords_master(records: list[dict]) -> list[list]:
+def normalize_landlords_master(records: list[dict], archive_records: list[dict] | None = None) -> list[list]:
     """jacquesdpr/payprop's data/landlords.json (sync pipeline master file,
     already one row per beneficiary-property pair, already reconciled
     against live PayProp data) -> Active Beneficiaries tab rows.
@@ -72,8 +72,19 @@ def normalize_landlords_master(records: list[dict]) -> list[list]:
     (confirmed against a real record 2026-09: is_owner was false on a
     beneficiary_type="Owner", status="Active" record -- is_owner is not the
     right field at all).
+
+    KNOWN PIPELINE BUG (2026-09-05, still open as of 2026-09-21 -- see the
+    task suggestion filed against jacquesdpr/payprop): a sync cycle mass-
+    archived 534 of 619 active landlords as "not_seen_in_cycle", a false
+    positive from its email-matching logic, not a real change. Pass
+    data/landlords-archive.json's records as archive_records and this
+    restores those specific records (and only those -- genuinely
+    `_removed_reason: "inactive"` records stay excluded) so the count isn't
+    wrong until the pipeline itself is fixed.
     """
     H = ACTIVE_BENEFICIARIES_HEADERS
+    if archive_records:
+        records = records + [r for r in archive_records if r.get("_removed_reason") == "not_seen_in_cycle"]
     rows = []
     for r in records:
         if r.get("beneficiary_type") != "Owner" or r.get("status") != "Active":
