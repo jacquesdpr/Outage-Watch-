@@ -78,13 +78,16 @@ ACTIVE_PHRASE = r"(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*reported\s+[^.]*?"
 # ("Edgemead. Monte Vista") partway through — it relies entirely on the
 # "Last checked:" anchor to stop, not on punctuation.
 PLANNED_PHRASE = r"Planned\s+(?:Water|Power)\s+shut-off\s+(?:in\s+[^.,]*?\s+on\s+|scheduled\s+for\s+[^.,]*?\s+).*?"
-# Confirmed via a live Brackenfell power page: "Possible power outage in
-# Brackenfell - residents reporting 4 residents have reported an outage in
-# the last 2 hours. The City of Cape Town has not logged it yet." — a
-# crowd-reported outage the City hasn't logged yet. Falls through to
-# "active" in the classification below since there's no "no ... outage
-# reported" or "planned" wording in it.
-POSSIBLE_PHRASE = r"Possible\s+(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*residents\s+reporting\s+.*?"
+# Confirmed via live Brackenfell/Burgundy Estate/Durbanville power pages —
+# two qualifier words seen so far: "Possible power outage in Brackenfell -
+# residents reporting 4 residents have reported an outage in the last 2
+# hours. The City of Cape Town has not logged it yet." and "Likely power
+# outage in Burgundy Estate - residents reporting 27 residents are
+# reporting an outage in the last 2 hours. ..." — both crowd-reported
+# outages the City hasn't logged yet. Falls through to "active" in the
+# classification below since there's no "no ... outage reported" or
+# "planned" wording in it.
+POSSIBLE_PHRASE = r"(?:Possible|Likely)\s+(?:Power|Water)\s+outage\s+in\s+[^.,]*?-\s*residents\s+reporting\s+.*?"
 STATUS_PATTERN = re.compile(
     rf"({CLEAR_PHRASE}|{ACTIVE_PHRASE}|{PLANNED_PHRASE}|{POSSIBLE_PHRASE})\.?\s*Last checked:\s*({DATETIME_PATTERN})",
     re.I,
