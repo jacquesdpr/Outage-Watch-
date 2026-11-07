@@ -7,7 +7,7 @@
         "status": "clear",
         "statusText": "No power outage reported in Brackenfell by the City",
         "note": "",
-        "checked": "2026-11-06 18:45",
+        "checked": "2026-11-07 00:30",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/brackenfell"
       },
       "water": {
@@ -52,7 +52,7 @@
         "status": "clear",
         "statusText": "No water outage reported in Century City",
         "note": "",
-        "checked": "2026-11-06 18:45",
+        "checked": "2026-11-06 23:45",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/century-city"
       }
     },
@@ -63,14 +63,14 @@
         "status": "clear",
         "statusText": "No power outage reported in Durbanville by the City",
         "note": "",
-        "checked": "2026-11-06 22:45",
+        "checked": "2026-11-07 04:00",
         "link": "https://www.ourpower.co.za/power-outages/cape-town/durbanville"
       },
       "water": {
         "status": "clear",
         "statusText": "No water outage reported in Durbanville",
         "note": "",
-        "checked": "2026-11-06 18:45",
+        "checked": "2026-11-07 04:00",
         "link": "https://www.ourpower.co.za/water-outages/cape-town/durbanville"
       }
     },
